@@ -4,6 +4,7 @@ from src.config.db import initialise_db
 
 
 app = Flask(__name__)
+app.secret_key = 'c904d70087ac7d9b078bc7958f89d9fc'
 api = Api(app)
 initialise_db(app)
 

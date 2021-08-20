@@ -36,9 +36,9 @@ class BaseController:
             return self.response.error(message=str(error), statusCode=400), 400
             
 
-    def update(self, id, payload):
+    def update(self, id, **payload):
         try:
-            data = self.repository.update(id=id, payload=payload)
+            data = self.repository.update(id=id, **payload)
             if data:
                 return self.response.successWithData(data=data, message=f"{self.name} updated successfully", statusCode=200)
             return self.response.error(message="Error occurred", statusCode=404), 404
