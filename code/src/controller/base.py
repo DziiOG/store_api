@@ -1,6 +1,5 @@
 
-from flask import jsonify
-
+from typing import Dict
 
 class BaseController:
     def __init__(self, name, repository, response):
@@ -9,7 +8,7 @@ class BaseController:
         self.response = response
     
 
-    def insert(self, **payload):
+    def insert(self, **payload: Dict) -> Dict:
         try: 
             data = self.repository.insert(**payload)
             if data:
@@ -17,7 +16,7 @@ class BaseController:
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-    def get_by_id(self, id):
+    def get_by_id(self, id: str) -> Dict:
         try:
             data = self.repository.get_by_id(id)
             if data:
@@ -26,7 +25,7 @@ class BaseController:
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-    def get_docs(self, **query):
+    def get_docs(self, **query: Dict) -> Dict:
         try:
             data = self.repository.get_docs(**query)
             if data:
