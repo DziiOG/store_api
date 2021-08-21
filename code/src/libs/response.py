@@ -10,5 +10,5 @@ def successWithData(data, message: str, statusCode: int = 200) -> Dict:
     return {'statusCode': statusCode, 'message': message, 'data': data}
 
 
-def error(message: str, statusCode: int = 400) -> Dict:
+def error(message: str or Dict, statusCode: int = 400) -> Dict:
     return {'statusCode': statusCode, 'message': message}
