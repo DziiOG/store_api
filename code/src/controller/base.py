@@ -1,18 +1,18 @@
 
 from typing import Dict
 
+
 class BaseController:
     def __init__(self, name, repository, response):
         self.name = name
         self.repository = repository
         self.response = response
-    
 
     def insert(self, **payload: Dict) -> Dict:
-        try: 
+        try:
             data = self.repository.insert(**payload)
             if data:
-                return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201 
+                return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
@@ -33,7 +33,6 @@ class BaseController:
             return self.response.error(message="No record found", statusCode=404), 404
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
-            
 
     def update(self, id, **payload):
         try:
@@ -44,7 +43,6 @@ class BaseController:
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-
     def delete(self, id):
         try:
             data = self.repository.delete(id=id)
@@ -53,7 +51,3 @@ class BaseController:
             return self.response.error(message="Error occured while deleting", statusCode=404)
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
-
-
-
-    

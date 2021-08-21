@@ -5,6 +5,7 @@ from flask import jsonify
 from bson import ObjectId
 import datetime
 
+
 class ItemModel(db.Document):
     name = db.StringField(required=True, unique=True)
     price = db.FloatField(required=True)
@@ -16,7 +17,6 @@ class ItemModel(db.Document):
             self.creation_date = datetime.datetime.now()
         self.modified_date = datetime.datetime.now()
         return super(ItemModel, self).save(*args, **kwargs)
-    
 
     def to_dict(self):
         return{
@@ -26,11 +26,3 @@ class ItemModel(db.Document):
             'createdAt': self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             'updatedAt': self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         }
-
-   
-
-
-
-
-
-

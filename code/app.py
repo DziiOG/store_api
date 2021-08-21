@@ -7,6 +7,8 @@ import os
 CONFIG = get_config[os.getenv('ENVIRONMENT')]
 
 # Handle generic request exceptions here
+
+
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """
@@ -24,6 +26,7 @@ def handle_exception(e):
     })
     response.content_type = "application/json"
     return response
+
 
 if __name__ == '__main__':
     app.logger.info('App running debug: {}'.format(CONFIG.DEBUG))

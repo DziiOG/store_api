@@ -43,13 +43,6 @@ def before_first_request():
 
 
 app.config.from_object(CONFIG)
-# authorizations = {
-#     'apikey': {
-#         'type': 'apiKey',
-#         'in': 'header',
-#         'name': 'Authorization'
-#     }
-# }
 
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 app.register_blueprint(blueprint)
