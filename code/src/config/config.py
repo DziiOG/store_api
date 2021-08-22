@@ -25,7 +25,7 @@ class BaseConfiguration(object):
     HOST = os.getenv('DEV_HOST')
     PORT = os.getenv('DEV_PORT')
 
-    ALLOWED_ORIGINS = "*"
+    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
 
     # SMTP Configuration
     MAIL_SERVER = os.getenv('DEV_MAIL_SERVER')

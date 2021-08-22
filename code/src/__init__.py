@@ -51,7 +51,6 @@ app.register_blueprint(blueprint)
 app.secret_key = CONFIG.SECRET_KEY
 bcrypt = Bcrypt(app)
 api = Api(app=app, prefix="/api/v1")
-jwt = JWT(app=app)
 initialise_db(app=app, CONFIG=CONFIG)
 
 
