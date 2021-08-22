@@ -1,5 +1,5 @@
 
-from flask import jsonify
+from typing import Dict
 
 
 class BaseController:
@@ -7,17 +7,16 @@ class BaseController:
         self.name = name
         self.repository = repository
         self.response = response
-    
 
-    def insert(self, **payload):
-        try: 
+    def insert(self, **payload: Dict) -> Dict:
+        try:
             data = self.repository.insert(**payload)
             if data:
-                return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201 
+                return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-    def get_by_id(self, id):
+    def get_by_id(self, id: str) -> Dict:
         try:
             data = self.repository.get_by_id(id)
             if data:
@@ -26,7 +25,7 @@ class BaseController:
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-    def get_docs(self, **query):
+    def get_docs(self, **query: Dict) -> Dict:
         try:
             data = self.repository.get_docs(**query)
             if data:
@@ -34,7 +33,6 @@ class BaseController:
             return self.response.error(message="No record found", statusCode=404), 404
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
-            
 
     def update(self, id, **payload):
         try:
@@ -45,7 +43,6 @@ class BaseController:
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
 
-
     def delete(self, id):
         try:
             data = self.repository.delete(id=id)
@@ -54,7 +51,3 @@ class BaseController:
             return self.response.error(message="Error occured while deleting", statusCode=404)
         except Exception as error:
             return self.response.error(message=str(error), statusCode=400), 400
-
-
-
-    

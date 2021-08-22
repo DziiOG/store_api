@@ -7,43 +7,46 @@ from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemP
 from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
 from flask import request
+from typing import Dict
 
 
 class ItemResource(Resource):
     def __init__(self):
         self.repository = ItemRepository(model=ItemModel)
-        self.controller = ItemController(name='Item', repository=self.repository, response=response)
+        self.controller = ItemController(
+            name='Item', repository=self.repository, response=response)
         self.patch_body_validation = ItemPatchBodyValidation()
         self.validate_id = Miscellaneous()
 
-    def get(self, id):
+    def get(self, id: str):
         try:
             self.validate_id.load({'id': id})
             return self.controller.get_by_id(id)
         except ValidationError as error:
-            return response.error(message=error.messages, statusCode=400)
+            return response.error(message=error.messages, statusCode=400), 400
 
-    def patch(self, id):
+    def patch(self, id: str):
         try:
             self.validate_id.load({'id': id})
-            data = request.get_json() 
+            data = request.get_json()
             self.patch_body_validation.load(data)
             return self.controller.update(id, **data)
         except ValidationError as error:
-            return response.error(message=error.messages, statusCode=400)
+            return response.error(message=error.messages, statusCode=400), 400
 
-    def delete(self, id):
+    def delete(self, id: str):
         try:
             self.validate_id.load({'id': id})
             return self.controller.delete(id)
         except ValidationError as error:
-            return response.error(message=error.messages)
+            return response.error(message=error.messages), 400
 
 
 class ItemListResource(Resource):
     def __init__(self):
         self.repository = ItemRepository(model=ItemModel)
-        self.controller = ItemController(name='Item', repository=self.repository, response=response)
+        self.controller = ItemController(
+            name='Item', repository=self.repository, response=response)
         self.body_validation = ItemBodyValidation()
         self.params_validation = ItemParamsValidation()
 
@@ -54,19 +57,11 @@ class ItemListResource(Resource):
             return self.controller.get_docs(**params)
         except ValidationError as error:
             return response.error(message=error.messages, statusCode=400), 400
-        
 
     def post(self):
-        try: 
+        try:
             request_data = request.get_json()
             self.body_validation.load(request_data)
             return self.controller.insert(**request_data)
         except ValidationError as error:
             return response.error(message=error.messages, statusCode=400), 400
-
-
-
-
-
-
-
