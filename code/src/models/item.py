@@ -18,6 +18,10 @@ class ItemModel(db.Document):
         self.modified_date = datetime.datetime.now()
         return super(ItemModel, self).save(*args, **kwargs)
 
+    def update(self, *args, **kwargs):
+        self.modified_date = datetime.datetime.now()
+        return super(UserModel, self).update(*args, **kwargs)
+
     def to_dict(self):
         return{
             '_id':  str(self.pk),
