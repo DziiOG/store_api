@@ -41,9 +41,7 @@ def before_first_request():
         mail_handler.setFormatter(logging.Formatter('[%(asctimes] %(levelname)s in %(module)s: %(message)s'))
         app.logger.addHandler(mail_handler)
 
-
 app.config.from_object(CONFIG)
-
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 app.register_blueprint(blueprint)
 
