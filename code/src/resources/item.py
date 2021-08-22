@@ -10,8 +10,15 @@ from flask import request
 from typing import Dict
 
 
+"""
+Item Resouce class
+
+"""
 class ItemResource(Resource):
+    """ ItemResouce class contains methods for getting, deleting and updating single item ITem """
+    
     def __init__(self):
+        """ Initialise Repository and controller variable neccessary for method action performance """
         self.repository = ItemRepository(model=ItemModel)
         self.controller = ItemController(
             name='Item', repository=self.repository, response=response)
@@ -19,10 +26,15 @@ class ItemResource(Resource):
         self.validate_id = Miscellaneous()
 
     def get(self, id: str):
+        """ method get Item """
         try:
+            #validate get item if id is prensent
             self.validate_id.load({'id': id})
+
+            #return controller method for getting Item by Id
             return self.controller.get_by_id(id)
         except ValidationError as error:
+            #return validation error if validation error occurs
             return response.error(message=error.messages, statusCode=400), 400
 
     def patch(self, id: str):
@@ -43,6 +55,8 @@ class ItemResource(Resource):
 
 
 class ItemListResource(Resource):
+    """ ItemListResouce class contains methods for getting and creating Item resouce """
+
     def __init__(self):
         self.repository = ItemRepository(model=ItemModel)
         self.controller = ItemController(

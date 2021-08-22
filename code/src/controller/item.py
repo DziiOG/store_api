@@ -1,6 +1,4 @@
-from flask import request
 from src.controller.base import BaseController
-from src.libs.response import successWithData, error
 
 
 class ItemController(BaseController):
