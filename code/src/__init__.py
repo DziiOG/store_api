@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 from src.config.db import initialise_db
 from src.config.config import get_config
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 import os
 import logging
 
@@ -47,6 +48,7 @@ app.register_blueprint(blueprint)
 
 
 app.secret_key = CONFIG.SECRET_KEY
+bcrypt = Bcrypt(app)
 api = Api(app=app, prefix="/api/v1")
 initialise_db(app=app, CONFIG=CONFIG)
 
