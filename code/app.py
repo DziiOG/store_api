@@ -1,10 +1,8 @@
-from src import app
-from src.config.config import get_config
-from flask import json
 from werkzeug.exceptions import HTTPException
+from src.config.config import CONFIG
+from flask import json
+from src import app
 import os
-
-CONFIG = get_config[os.getenv('ENVIRONMENT')]
 
 # Handle generic request exceptions here
 

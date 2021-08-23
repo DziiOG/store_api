@@ -1,7 +1,11 @@
 
 from dotenv import load_dotenv
 import os
+
+# load all variable from .env file
 load_dotenv()
+
+
 
 class BaseConfiguration(object):
     """
