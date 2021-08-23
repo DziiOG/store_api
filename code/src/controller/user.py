@@ -1,4 +1,5 @@
 from src.controller.base import BaseController
+from src import app
 
 
 class UserController(BaseController):
@@ -21,8 +22,30 @@ class UserController(BaseController):
                 if result:
                     return self.response.successWithData(data=result, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
 
-        # if user exists raise error
+        # # if user exists raise error
+        # except Exception as error:
+        #     self.response.error(message=str(error))
+
+    def login(self, **payload):
+        try:
+            username = payload.get('username')
+            password = payload.get('password')
+            user = self.repository.get_docs(raw=True, username=username)
+            if user is None:
+                raise Exception("Incorrect Email or Password")
+            else:
+                is_correct = user[0].check_password_correction(password)
+                if is_correct:
+                    auth_token = user[0].encode_auth_token(
+                        user[0].to_dict().get('_id', None))
+                    response_data = {
+                        **user[0].to_dict(), 'auth_token': auth_token.decode('utf-8')}
+                    print(response_data)   
+                    return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=201)
+
         except Exception as error:
-            self.response.error(message=str(error))
+            app.logger.error(error)
+            return self.response.error(message=str(error), statusCode=400), 400

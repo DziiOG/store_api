@@ -22,11 +22,14 @@ class BaseRepository:
         except Exception as error:
             raise error
 
-    def get_docs(self, **query) -> List[Dict]:
+    def get_docs(self, raw=False, **query) -> List[Dict]:
         try:
             data = self.model.objects().filter(**query)
-            if data:
+            if data and raw is False:
                 return [item.to_dict() for item in data]
+            else:
+                if data and raw is True:
+                    return [item for item in data]
         except Exception as error:
             raise error
 
