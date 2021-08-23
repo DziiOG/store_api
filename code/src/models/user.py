@@ -1,10 +1,10 @@
-from src.config.db import db
-import os
-from marshmallow import ValidationError
-from src import bcrypt
-from src.config.config import CONFIG
-import jwt
 from datetime import datetime, timedelta
+from marshmallow import ValidationError
+from src.config.config import CONFIG
+from src.config.db import db
+from src import bcrypt
+import jwt
+import os
 
 
 class UserModel(db.Document):
@@ -37,6 +37,9 @@ class UserModel(db.Document):
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )
+
+    def check_password_correction(self, attempted_password):
+            return bcrypt.check_password_hash(self.password, attempted_password)
 
     @staticmethod
     def encode_auth_token(user_id, days=3, seconds=0):
