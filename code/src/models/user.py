@@ -84,7 +84,7 @@ class UserModel(db.Document):
         try:
             # get user id
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
-            # returns id
+            # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
             return cls.getUser(payload['sub'])
 
