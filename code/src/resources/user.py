@@ -11,23 +11,25 @@ from typing import Dict
 
 
 class UserLoginResource(Resource):
-      def __init__(self):
+    def __init__(self):
         self.repository = UserRepository(model=UserModel)
         self.controller = UserController(
             name="User", repository=self.repository, response=response)
         self.validate_login = UserLoginValidation()
 
-      def post(self):
+    def post(self):
         try:
             data = request.get_json()
             self.validate_login.load(data)
             return self.controller.login(**data)
-          
+
         except Exception as error:
             if isinstance(error, ValidationError):
                 return response.error(message=error.messages), 400
             else:
                 return response.error(message=str(error)), 400
+
+
 class UserSignUpResource(Resource):
     def __init__(self):
         self.repository = UserRepository(model=UserModel)
@@ -51,21 +53,19 @@ class UserSignUpResource(Resource):
             else:
                 return response.error(message=str(error)), 400
 
+
 class UserListResource(Resource):
-     def __init__(self):
+    def __init__(self):
         self.repository = UserRepository(model=UserModel)
         self.controller = UserController(
             name="User", repository=self.repository, response=response)
         self.params_validation = UserQueryValidation()
 
-     @Authenticate.is_authenticated_or_authorised()
-     def get(self):
-            try:
-                params = request.args.to_dict(flat=True)
-                self.params_validation.load(params)
-                return self.controller.get_docs(**params)
-            except ValidationError as error:
-                return response.error(message=error.messages, statusCode=400), 400
-
-
-
+    @Authenticate.is_authenticated_or_authorised()
+    def get(self):
+        try:
+            params = request.args.to_dict(flat=True)
+            self.params_validation.load(params)
+            return self.controller.get_docs(**params)
+        except ValidationError as error:
+            return response.error(message=error.messages, statusCode=400), 400

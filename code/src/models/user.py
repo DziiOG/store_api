@@ -1,8 +1,8 @@
+from werkzeug.security import safe_str_cmp
 from datetime import datetime, timedelta
 from marshmallow import ValidationError
 from src.config.config import CONFIG
 from src.config.db import db
-from werkzeug.security import safe_str_cmp
 from src import bcrypt
 import jwt
 import os
@@ -85,6 +85,7 @@ class UserModel(db.Document):
             # get user id
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
             # returns id
+            # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
             return cls.getUser(payload['sub'])
 
         except jwt.ExpiredSignatureError:
