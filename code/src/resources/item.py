@@ -1,14 +1,13 @@
+from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
+from src.security.authenticate import Authenticate
+from src.repositories.item import ItemRepository
+from src.validations.misc import Miscellaneous
+from src.controller.item import ItemController
+from marshmallow import ValidationError
+from src.models.item import ItemModel
 from flask_restful import Resource
 from src.libs import response
-from src.models.item import ItemModel
-from src.controller.item import ItemController
-from src.repositories.item import ItemRepository
-from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
-from src.validations.misc import Miscellaneous
-from marshmallow import ValidationError
-from src.security.authenticate import Authenticate
 from flask import request
-from typing import Dict
 
 
 """
@@ -32,8 +31,6 @@ class ItemResource(Resource):
         try:
             #validate get item if id is prensent
             self.validate_id.load({'id': id})
-
-
             #return controller method for getting Item by Id
             return self.controller.get_by_id(id)
         except ValidationError as error:
