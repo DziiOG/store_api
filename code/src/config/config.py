@@ -61,3 +61,5 @@ get_config = dict(
     TEST=TestConfig,
     PROD=ProdConfig
 )
+
+CONFIG = get_config[os.getenv('ENVIRONMENT')]
