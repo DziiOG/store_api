@@ -5,7 +5,7 @@ from src.controller.user import UserController
 from src.repositories.user import UserRepository
 from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
 from marshmallow import ValidationError
-from werkzeug.security import safe_str_cmp
+from src.security.authenticate import Authenticate
 from flask import request
 from typing import Dict
 
@@ -41,7 +41,7 @@ class UserSignUpResource(Resource):
             self.validate_sign_up.load(data)
             confirm_password = data.get('confirm_password')
             password = data.get('password')
-            if safe_str_cmp(password, confirm_password):
+            if UserModel.compare_password(password, confirm_password):
                 return self.controller.sign_up(**data)
             else:
                 raise Exception("confirm password must be equal to password")
@@ -58,6 +58,7 @@ class UserListResource(Resource):
             name="User", repository=self.repository, response=response)
         self.params_validation = UserQueryValidation()
 
+     @Authenticate.is_authenticated_or_authorised()
      def get(self):
             try:
                 params = request.args.to_dict(flat=True)

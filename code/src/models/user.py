@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from marshmallow import ValidationError
 from src.config.config import CONFIG
 from src.config.db import db
+from werkzeug.security import safe_str_cmp
 from src import bcrypt
 import jwt
 import os
@@ -60,6 +61,11 @@ class UserModel(db.Document):
             raise e
 
 
+    @staticmethod
+    def compare_password(password, comparant_password):
+        return safe_str_cmp(password, comparant_password)
+
+
     @classmethod
     def getUser(cls, user_id):
         try:
@@ -80,8 +86,13 @@ class UserModel(db.Document):
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
             # returns id
             return cls.getUser(payload['sub'])
+
         except jwt.ExpiredSignatureError:
             raise Exception('token has expired. Please log in again.')
+
+
         except jwt.InvalidTokenError:
-            raise Exception('Invalid token. Please log in again.')    
+
+            raise Exception('Invalid token. Please log in again.')  
+
 
