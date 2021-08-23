@@ -16,7 +16,6 @@ class BaseRepository:
     def get_by_id(self, id: str) -> Dict:
         try:
             data = self.model.objects().get(id=id)
-            print(dict(data))
             if data:
                 return data.to_dict()
         except Exception as error:

@@ -33,6 +33,7 @@ class ItemResource(Resource):
             #validate get item if id is prensent
             self.validate_id.load({'id': id})
 
+
             #return controller method for getting Item by Id
             return self.controller.get_by_id(id)
         except ValidationError as error:

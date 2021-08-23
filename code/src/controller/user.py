@@ -43,7 +43,6 @@ class UserController(BaseController):
                         user[0].to_dict().get('_id', None))
                     response_data = {
                         **user[0].to_dict(), 'auth_token': auth_token.decode('utf-8')}
-                    print(response_data)   
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=201)
 
         except Exception as error:
