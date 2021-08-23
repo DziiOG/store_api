@@ -18,7 +18,7 @@ class Authenticate():
 
     @staticmethod
     def is_authenticated_or_authorised():
-        """A wrapper to authorize specific roles for specific endpoints :param roles: a list of roles allowed :return:
+        """A wrapper to authorize user to access endpoints
         """
         def authentication_decorator(func):
             @wraps(func)
@@ -34,13 +34,20 @@ class Authenticate():
                         g.user = user
                     else:
                         return error(message="Unauthorized", statusCode=401), 401
+
+                    # return next function    
                     return func(*args, **kwargs)
                 except KeyError as err:
+                    #log error
                     app.logger.error(err)
+
+                    #return error
                     return error(message=str(err), statusCode=400), 400
                 
                 except Exception as e:
+                    
                     app.logger.error(e)
+
                     return error(message=str(e), statusCode=500), 500
             return wrapper
         return authentication_decorator
