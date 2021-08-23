@@ -8,7 +8,6 @@ from flask_jwt import JWT
 import os
 import logging
 
-
 CONFIG = get_config[os.getenv('ENVIRONMENT')]
 app = Flask(__name__)
 
@@ -36,7 +35,7 @@ def before_first_request():
         mail_handler = SMTPHandler(
             mailhost=CONFIG.MAIL_SERVER,
             fromaddr=CONFIG.MAIL_USERNAME,
-            toaddrs=['lildzii.wd@completefarmer.com'],
+            toaddrs=['lildzii.wd@gmail.com'],
             subject='Store API Error'
         )
         mail_handler.setLevel(log_level)

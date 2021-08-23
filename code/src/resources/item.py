@@ -6,6 +6,7 @@ from src.repositories.item import ItemRepository
 from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
 from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
+from src.security.authenticate import Authenticate
 from flask import request
 from typing import Dict
 
@@ -64,6 +65,7 @@ class ItemListResource(Resource):
         self.body_validation = ItemBodyValidation()
         self.params_validation = ItemParamsValidation()
 
+    @Authenticate.is_authenticated_or_authorised()
     def get(self):
         try:
             params = request.args.to_dict(flat=True)

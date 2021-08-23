@@ -33,21 +33,18 @@ class UserController(BaseController):
         try:
             username = payload.get('username')
             password = payload.get('password')
-            user = self.repository.get_docs(username=username)
-            if user:
-                is_correct = user.check_password_correction(password)
-
-                if is_correct:
-                    auth_token = user.encode_auth_token(
-                        user.to_dict().get('_id', None))
-
-                    response_data = {
-                        **user.to_dict(), 'auth_token': auth_token}
-
-                    return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=201)
-
-            else:
+            user = self.repository.get_docs(raw=True, username=username)
+            if user is None:
                 raise Exception("Incorrect Email or Password")
+            else:
+                is_correct = user[0].check_password_correction(password)
+                if is_correct:
+                    auth_token = user[0].encode_auth_token(
+                        user[0].to_dict().get('_id', None))
+                    response_data = {
+                        **user[0].to_dict(), 'auth_token': auth_token.decode('utf-8')}
+                    print(response_data)   
+                    return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=201)
 
         except Exception as error:
             app.logger.error(error)

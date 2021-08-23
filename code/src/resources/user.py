@@ -3,7 +3,7 @@ from src.libs import response
 from src.models.user import UserModel
 from src.controller.user import UserController
 from src.repositories.user import UserRepository
-from src.validations.user import UserSignUpValidation, UserQueryValidation
+from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
 from marshmallow import ValidationError
 from werkzeug.security import safe_str_cmp
 from flask import request

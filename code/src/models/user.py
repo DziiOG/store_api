@@ -45,11 +45,9 @@ class UserModel(db.Document):
     def encode_auth_token(user_id, days=3, seconds=0):
         """ Generates the Auth Token :return: string  """
         try:
-           
-           
             payload = {
-                'exp': datetime.datetime.utcnow() + timedelta(days=days, seconds=seconds),
-                'iat': datetime.datetime.utcnow(),
+                'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
+                'iat': datetime.utcnow(),
                 'sub': user_id
             }
             
@@ -60,6 +58,8 @@ class UserModel(db.Document):
             )
         except Exception as e:
             raise e
+
+
     @classmethod
     def getUser(cls, user_id):
         try:
@@ -68,6 +68,8 @@ class UserModel(db.Document):
                 return user.to_dict()      
         except Exception as error:
             raise error
+
+
 
     @classmethod
     def decode_auth_token(cls, auth_token):

@@ -29,19 +29,19 @@ class Authenticate():
 
                     #decode token
                     user = UserModel.decode_auth_token(token)
-
+                    #store user
                     if user:
                         g.user = user
                     else:
                         return error(message="Unauthorized", statusCode=401), 401
-
+                    return func(*args, **kwargs)
                 except KeyError as err:
                     app.logger.error(err)
-                    return error(message="Invalid payload", statusCode=400), 400
+                    return error(message=str(err), statusCode=400), 400
                 
                 except Exception as e:
                     app.logger.error(e)
-                    return error(message="Sorry, an error occured while processing your request", statusCode=500), 500
+                    return error(message=str(e), statusCode=500), 500
             return wrapper
         return authentication_decorator
 
