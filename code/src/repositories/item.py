@@ -1,6 +1,8 @@
 from src.repositories.base import BaseRepository
+from src.models.item import ItemModel
 
 
 class ItemRepository(BaseRepository):
-    def __init__(self, model):
-        super().__init__(model)
+    def __init__(self):
+        self.model = ItemModel
+        super().__init__(model=self.model)
