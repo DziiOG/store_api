@@ -1,10 +1,12 @@
 from src.controller.base import BaseController
+from src.repositories.user import UserRepository
 from src import app
 
-
 class UserController(BaseController):
-    def __init__(self, name, repository, response):
-        super().__init__(name, repository, response)
+    def __init__(self):
+        self.name = 'User'
+        self.repository = UserRepository()
+        super().__init__(name=self.name, repository=self.repository)
 
     def sign_up(self, **payload):
         try:
@@ -24,10 +26,6 @@ class UserController(BaseController):
         except Exception as error:
             app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
-
-        # # if user exists raise error
-        # except Exception as error:
-        #     self.response.error(message=str(error))
 
     def login(self, **payload):
         try:
