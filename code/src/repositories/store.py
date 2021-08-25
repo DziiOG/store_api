@@ -1,8 +1,7 @@
 from src.repositories.base import BaseRepository
-from src.models.user import UserModel
+from src.models.store import StoreModel
 
-
-class UserRepository(BaseRepository):
+class StoreRepository(BaseRepository):
     def __init__(self):
-        self.model = UserModel
+        self.model = StoreModel
         super().__init__(model=self.model)
