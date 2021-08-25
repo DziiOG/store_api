@@ -3,7 +3,7 @@ from typing import Dict
 
 
 class BaseController:
-    def __init__(self, name, repository):
+    def __init__(self, name: str, repository):
         self.name = name
         self.repository = repository
         self.response = response

@@ -13,9 +13,9 @@ class ItemResource(Resource):
         return ItemController().get_by_id(id)
 
     @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=ItemPatchBodyValidation())
+    @Validator.validate(ItemPatchBodyValidation())
     def patch(self, id: str):
-        return ItemController().update(id, **data)
+        return ItemController().update(id, **g.body)
 
     @Authenticate.is_authenticated_or_authorised()
     def delete(self, id: str):
@@ -26,7 +26,7 @@ class ItemListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
     @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(ItemParamsValidation(), validation_data="params")
+    @Validator.validate(ItemParamsValidation(), "params")
     def get(self):
         return ItemController().get_docs(**g.params)
 

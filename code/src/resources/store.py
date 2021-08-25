@@ -1,74 +1,44 @@
 
-from flask_restful import Resource
-from marshmallow import ValidationError
-from src.controller.store import StoreController
-from src.models.store import StoreModel
-from src.validations.misc import Miscellaneous
+from src.validations.store import StoreBodyValidation, StoreParamsValidation, StorePatchBodyValidation
+from src.security.authenticate import Authenticate
 from src.repositories.store import StoreRepository
+from src.controller.store import StoreController
+from src.validations.validator import Validator
+from src.validations.misc import Miscellaneous
+from marshmallow import ValidationError
+from src.models.store import StoreModel
+from flask_restful import Resource
 from src.libs import response
-from flask import request
+from flask import request, g
 
 class StoreResource(Resource):
     """ StoreResouce class contains methods for getting, deleting and updating single store """
 
-    def __init__(self):
-        """ Initialise Repository and controller variable neccessary for method action performance """
-        self.repository = StoreRepository(model=StoreModel)
-        self.controller = StoreController(
-            name='Store', repository=self.repository, response=response)
-        self.validate_id = Miscellaneous()
-
-    def get(self, id: str):
-        try:
-            # validate get item if id is prensent
-            self.validate_id.load({'id': id})
-            # return controller method for getting Item by Id
-            return self.controller.get_by_id(id)
-
-        except Exception as error:
-            # return validation error if validation error occurs
-            return response.error(message=error.messages, statusCode=400), 400
-
+    @Authenticate.is_authenticated_or_authorised()
+    def get(self, id: str):            
+        return StoreController().get_by_id(id)
+    
+    @Authenticate.is_authenticated_or_authorised()
+    @Validator.validate(validator=StorePatchBodyValidation())
     def patch(self, id: str):
-        try:
-            self.validate_id.load({'id': id})
-            data = request.get_json()
-            self.patch_body_validation.load(data)
-            return self.controller.update(id, **data)
-        except ValidationError as error:
-            return response.error(message=error.messages, statusCode=400), 400
+            return StoreController().update(id, **g.body)
 
+    @Authenticate.is_authenticated_or_authorised()
     def delete(self, id: str):
-        try:
-            self.validate_id.load({'id': id})
-            return self.controller.delete(id)
-        except ValidationError as error:
-            return response.error(message=error.messages), 400
+        return StoreController().delete(id)
+       
 
 
 class StoreListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
-    def __init__(self):
-        """ Initialise Repository and controller variable neccessary for method action performance """
-        self.repository = StoreRepository(model=StoreModel)
-        self.controller = StoreController(
-            name='Store', repository=self.repository, response=response)
-        self.validate_id = Miscellaneous()
-        self.params_validation = ""
-
+    @Authenticate.is_authenticated_or_authorised()
+    @Validator.validate(validator=StoreParamsValidation())
     def get(self):
-        try:
-            params = request.args.to_dict(flat=True)
-            # self.params_validation.load(params)
-            return self.controller.get_docs(**params)
-        except ValidationError as error:
-            return response.error(message=error.messages, statusCode=400), 400
+        return StoreController().get_docs(**g.params)
 
+    @Authenticate.is_authenticated_or_authorised()
+    @Validator.validate(validator=StoreBodyValidation())
     def post(self):
-        try:
-            # request_data = request.get_json()
-            self.body_validation.load(request_data)
-            return self.controller.insert(**request_data)
-        except ValidationError as error:
-            return response.error(message=error.messages, statusCode=400), 400
+        return StoreController().insert(**g.body)
+

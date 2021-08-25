@@ -6,20 +6,20 @@ from src.security.authenticate import Authenticate
 from flask import request, g
 
 class UserLoginResource(Resource):
-   
+
     @Validator.validate(validator=UserLoginValidation())
     def post(self):
         return UserController().login(**g.body)
 
 class UserSignUpResource(Resource):
-   
+
     @Validator.validate(validator=UserSignUpValidation())
     @Validator.validate_password()
     def post(self):
         return UserController().sign_up(**g.body)
            
 class UserListResource(Resource):
-   
+
     @Authenticate.is_authenticated_or_authorised()
     @Validator.validate(validator=UserQueryValidation(), validation_data="params")
     def get(self):

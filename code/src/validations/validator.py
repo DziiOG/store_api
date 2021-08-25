@@ -19,7 +19,6 @@ class Validator():
                     if validation_data == 'body':
                         validator.load(request.get_json())
                         g.body = request.get_json()
-
                     return func(*args, **kwargs)
                 except ValidationError as error:
                     return response.error(message=error.messages, statusCode=400), 400

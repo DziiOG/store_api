@@ -17,17 +17,17 @@ class StoreModel(db.Document):
         if not self.creation_date:
             self.creation_date = datetime.datetime.now()
         self.modified_date = datetime.datetime.now()
-        return super(ItemModel, self).save(*args, **kwargs)
+        return super(StoreModel, self).save(*args, **kwargs)
 
     def update(self, *args, **kwargs):
         self.modified_date = datetime.datetime.now()
-        return super(UserModel, self).update(*args, **kwargs)
+        return super(StoreModel, self).update(*args, **kwargs)
 
     def to_dict(self):
         return{
             '_id':  str(self.pk),
             'name': self.name,
-            'items': self.price,
+            'items': [ item.mongo_db()  for item in self.items],
             'createdAt': self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             'updatedAt': self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         }

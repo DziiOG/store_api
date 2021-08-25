@@ -2,6 +2,7 @@ from src.controller.base import BaseController
 from src.repositories.user import UserRepository
 from src import app
 
+
 class UserController(BaseController):
     def __init__(self):
         self.name = 'User'
@@ -41,7 +42,8 @@ class UserController(BaseController):
                         user[0].to_dict().get('_id', None))
                     response_data = {
                         **user[0].to_dict(), 'auth_token': auth_token.decode('utf-8')}
-                    return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=201)
+                    return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200
+                return self.response.error(message="Incorrect Credentials, Please try again"), 400
 
         except Exception as error:
             app.logger.error(error)
