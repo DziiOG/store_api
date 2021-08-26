@@ -33,7 +33,7 @@ class StoreListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
     @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StoreParamsValidation())
+    @Validator.validate(validator=StoreParamsValidation(), validation_data="params")
     def get(self):
         return StoreController().get_docs(**g.params)
 

@@ -27,7 +27,7 @@ class StoreModel(db.Document):
         return{
             '_id':  str(self.pk),
             'name': self.name,
-            'items': [ item.mongo_db()  for item in self.items],
+            'items': [ ItemModel.objects().get(id=item.pk).to_dict() for item in self.items if item],
             'createdAt': self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             'updatedAt': self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         }
