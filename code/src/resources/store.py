@@ -1,5 +1,5 @@
 
-from src.validations.store import StoreBodyValidation, StoreParamsValidation, StorePatchBodyValidation
+from src.validations.store import StoreBodyValidation, StoreParamsValidation, StorePatchBodyValidation, StoreItemPatchBodyValidation
 from src.security.authenticate import Authenticate
 from src.repositories.store import StoreRepository
 from src.controller.store import StoreController
@@ -27,13 +27,11 @@ class StoreResource(Resource):
     def delete(self, id: str):
         return StoreController().delete(id)
        
-
-
 class StoreListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
     @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StoreParamsValidation())
+    @Validator.validate(validator=StoreParamsValidation(), validation_data="params")
     def get(self):
         return StoreController().get_docs(**g.params)
 
@@ -42,3 +40,10 @@ class StoreListResource(Resource):
     def post(self):
         return StoreController().insert(**g.body)
 
+
+class StoreItemResource(Resource):
+    @Authenticate.is_authenticated_or_authorised()
+    @Validator.validate(validator=StoreItemPatchBodyValidation())
+    def patch(self, id):
+        return StoreController().update_items(id, **g.body)
+    

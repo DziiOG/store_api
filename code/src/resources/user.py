@@ -1,8 +1,8 @@
-from flask_restful import Resource
-from src.validations.validator import Validator
-from src.controller.user import UserController
 from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
 from src.security.authenticate import Authenticate
+from src.validations.validator import Validator
+from src.controller.user import UserController
+from flask_restful import Resource
 from flask import request, g
 
 class UserLoginResource(Resource):
