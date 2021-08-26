@@ -1,9 +1,9 @@
-from functools import wraps
-from src import app
+from src.repositories.user import UserRepository
 from src.models.user import UserModel
 from src.libs.response import error
-from src.repositories.user import UserRepository
 from flask import request, g
+from functools import wraps
+from src import app
 
 
 #################################################################

@@ -15,17 +15,24 @@ class UserController(BaseController):
             username = payload.get('username')
             data = self.repository.get_docs(username=username)
             if data is not None:
+                #if user exist raise an exception
                 raise Exception("User already exists")
             else:
+                # initial data with username and password
                 data = {
                     'username': username,
                     'password': payload.get('password')
                 }
+                #insert new user's data
                 result = self.repository.insert(**data)
+
                 if result:
+                    #if result return user created details
                     return self.response.successWithData(data=result, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
+            #log the error
             app.logger.error(error)
+            #return response with error messsage
             return self.response.error(message=str(error), statusCode=400), 400
 
     def login(self, **payload):

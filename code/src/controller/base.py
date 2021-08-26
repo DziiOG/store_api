@@ -1,5 +1,6 @@
 from src.libs import response
 from typing import Dict
+from src import app
 
 
 class BaseController:
@@ -14,6 +15,7 @@ class BaseController:
             if data:
                 return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
 
     def get_by_id(self, id: str) -> Dict:
@@ -23,6 +25,7 @@ class BaseController:
                 return self.response.successWithData(data=data, message=f"{self.name} fetched succesfully", statusCode=201)
             return self.response.error(message="No record found", statusCode=404), 404
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
 
     def get_docs(self, **query: Dict) -> Dict:
@@ -32,6 +35,7 @@ class BaseController:
                 return self.response.successWithData(data=data, message=f"{self.name} fetched succesfully", statusCode=200)
             return self.response.error(message="No record found", statusCode=404), 404
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
 
     def update(self, id, **payload):
@@ -41,6 +45,7 @@ class BaseController:
                 return self.response.successWithData(data=data, message=f"{self.name} updated successfully", statusCode=200)
             return self.response.error(message="Error occurred", statusCode=404), 404
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
 
     def delete(self, id):
@@ -50,4 +55,5 @@ class BaseController:
                 return self.response.successWithData(data=data, message=f"{self.name} deleted successfully", statusCode=200)
             return self.response.error(message="Error occured while deleting", statusCode=404)
         except Exception as error:
+            app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400

@@ -1,5 +1,5 @@
-from src.controller.base import BaseController
 from src.repositories.store import StoreRepository
+from src.controller.base import BaseController
 
 class StoreController(BaseController):
     def __init__(self):

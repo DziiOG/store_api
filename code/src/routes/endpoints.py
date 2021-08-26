@@ -2,10 +2,10 @@
 endpoints module contains api resources and application routes for accessing those resouces
 """
 
-from src import api
-from src.resources.item import ItemResource, ItemListResource
 from src.resources.user import UserSignUpResource, UserListResource, UserLoginResource
 from src.resources.store import StoreResource, StoreListResource
+from src.resources.item import ItemResource, ItemListResource
+from src import api
 
 # ItemResources routes
 
