@@ -12,9 +12,11 @@ class StoreBodyValidation(Schema):
 
 class StorePatchBodyValidation(Schema):
     name = fields.String(required=True)
-    items = fields.List(fields.String())
     creation_date = fields.Date()
     modified_date = fields.Date()
+
+class StoreItemPatchBodyValidation(Schema):
+    items = fields.List(fields.String(required=True))
 
 
 class StoreParamsValidation(Schema):

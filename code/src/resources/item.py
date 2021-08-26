@@ -34,3 +34,12 @@ class ItemListResource(Resource):
     @Validator.validate(ItemBodyValidation())
     def post(self):
         return ItemController().insert(**g.body)
+
+
+class ItemStoreResource(Resource):
+
+    @Authenticate.is_authenticated_or_authorised()
+    @Validator.validate(validator=ItemParamsValidation(), validation_data="params")
+    def get(self, id):
+        return ItemController().stores_by_item(id)
+
