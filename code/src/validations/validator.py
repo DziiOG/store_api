@@ -1,6 +1,7 @@
 from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
 from src.models.user import UserModel
+from src import app
 from src.libs import response
 from flask import request, g
 from functools import wraps
@@ -61,5 +62,28 @@ class Validator():
             return wrapper
         #return the decorator validate_password decorator
         return validate_password_decorator
+    
+    
+    @staticmethod
+    def username_or_email_exists():
+        def username_or_email_exist_decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+               try: 
+                    for key in g.body:
+                        if key == 'username':
+                            if UserModel.objects().filter(username=g.body[key]):
+                                raise Exception("Username already exists")
+                            
+                        if key == 'email':
+                            if UserModel.objects().filter(email=g.body[key]):
+                                raise Exception("Email already exists")
+                            
+                    return func(*args, **kwargs)
+               except Exception as error:
+                   app.logger.error(error)
+                   return response.error(message=str(error), statusCode=400),400
+            return wrapper
+        return username_or_email_exist_decorator
 
     

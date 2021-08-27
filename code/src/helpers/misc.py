@@ -7,4 +7,4 @@ class Status(Enum):
     
 class ROLES(Enum):
     ADMIN = 'ADMIN'
-    REGULAR_USER = 'REGULAR_USER' 
+    REGULER_USER = 'REGULER_USER' 

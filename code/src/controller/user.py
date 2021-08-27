@@ -1,5 +1,8 @@
 from src.controller.base import BaseController
+from functools import wraps
+from flask import g
 from src.repositories.user import UserRepository
+from src.security.redis import CacheUser
 from src import app
 
 
@@ -8,7 +11,7 @@ class UserController(BaseController):
         self.name = 'User'
         self.repository = UserRepository()
         super().__init__(name=self.name, repository=self.repository)
-
+        
     def sign_up(self, **payload):
         try:
             # check if user already exists by using username
@@ -20,13 +23,15 @@ class UserController(BaseController):
                 # if user exist raise an exception
                 raise Exception("User already exists")
             else:
-
+                if payload.get('status', None):
+                    del payload['status']
+                    
+                del payload['confirm_password']
                 # insert new user's data
                 result = self.repository.insert(**payload)
-
-                if result:
-                    # if result return user created details
-                    return self.response.successWithData(data=result, message=f"{self.name} created succesfully", statusCode=201), 201
+                
+                # if result return user created details
+                return self.response.successWithData(data=result, message=f"{self.name} created succesfully", statusCode=201), 201
         except Exception as error:
             # log the error
             app.logger.error(error)
@@ -45,6 +50,9 @@ class UserController(BaseController):
                 if is_correct:
                     data = user[0].encode_auth_token(
                         user_id=user[0].to_dict().get('_id', None), email=user[0].to_dict().get('email', None))
+                    
+                    CacheUser.cache_user(data['auth_token'], user)
+                    
                     response_data = dict(
                         **user[0].to_dict(),
                         auth_token=data['auth_token']

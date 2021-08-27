@@ -22,6 +22,8 @@ class Authenticate():
     
     @staticmethod
     def access(roles : List[str] ):
+        
+        
         """A wrapper to authorize user to access endpoints provided they have certain roles
         """
         def access_decorator():
@@ -78,6 +80,8 @@ class Authenticate():
                     
                     # get cached redis user
                     user = json.loads(Client.get(token))
+                    
+                    print(user)
                     
                     #decode token
                     isVerified = UserModel.decode_auth_token(token)

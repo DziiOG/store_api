@@ -19,9 +19,6 @@ class UserModel(db.Document):
     modified_date = db.DateTimeField(default=datetime.now)
 
     def clean(self):
-        if self.password is not None:
-            if len(self.password) < 6:
-                raise ValidationError("Password should be more than 6")
         self.password = bcrypt.generate_password_hash(
             self.password).decode('utf-8')
 
@@ -40,8 +37,8 @@ class UserModel(db.Document):
             _id=str(self.pk),
             email=self.email,
             username=self.username,
-            status=self.status,
-            roles=self.roles,
+            status=str(self.status.value),
+            roles=str(self.roles.value),
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )

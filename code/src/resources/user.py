@@ -15,6 +15,7 @@ class UserSignUpResource(Resource):
 
     @Validator.validate(validator=UserSignUpValidation())
     @Validator.validate_password()
+    @Validator.username_or_email_exists()
     def post(self):
         return UserController().sign_up(**g.body)
            
