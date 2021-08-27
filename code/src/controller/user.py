@@ -44,18 +44,17 @@ class UserController(BaseController):
             password = payload.get('password')
             user = self.repository.get_docs(raw=True, email=email)
             if user is None:
-                raise Exception("Incorrect Email or Password")
+                raise Exception("Incorrect Credentials, Please try again")
             else:
                 is_correct = user[0].check_password_correction(password)
                 if is_correct:
                     data = user[0].encode_auth_token(
                         user_id=user[0].to_dict().get('_id', None), email=user[0].to_dict().get('email', None))
-                    
-                    CacheUser.cache_user(data['auth_token'], user)
-                    
+                    print(user)
+                    CacheUser.cache_user(data['auth_token'], user[0].to_dict()) 
                     response_data = dict(
                         **user[0].to_dict(),
-                        auth_token=data['auth_token']
+                        auth_token=data['auth_token'].decode('utf-8')
                     )
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200
                 return self.response.error(message="Incorrect Credentials, Please try again"), 400

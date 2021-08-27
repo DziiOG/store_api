@@ -53,13 +53,14 @@ class UserModel(db.Document):
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
                 'iat': datetime.utcnow(),
-                'sub': str(dict(user_id=user_id, email=email)).encode('utf-8')
+                'sub': dict(user_id=user_id, email=email)
             }
             auth_token = jwt.encode(
                 payload,
                 CONFIG.SECRET_KEY,
                 algorithm='HS256'
             )
+                        
             return dict(auth_token=auth_token)
         except Exception as e:
             raise e

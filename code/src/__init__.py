@@ -1,4 +1,4 @@
-from src.config.redis import connect_to_redis
+from redis.exceptions import ConnectionError, AuthenticationError
 from flask_restful import Resource, Api
 from src.config.db import initialise_db
 from src.config.config import CONFIG
@@ -73,7 +73,14 @@ api = Api(app=app, prefix="/api/v1")
 initialise_db(app=app, CONFIG=CONFIG)
 
 
-connect_to_redis(redis=redis, CONFIG=CONFIG, app=app)
+try:
+    redis_client = redis.Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=0)
+    if redis_client.ping():
+        app.logger.info(f"Connected to Redis on {CONFIG.REDIS_HOST}".format()) 
+except ConnectionError as err:
+    app.logger.error(err)
+except AuthenticationError as err:
+    app.logger.error(err)
 
 #return resources
 from src.routes import endpoints

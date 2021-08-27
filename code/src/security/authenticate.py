@@ -1,6 +1,6 @@
 from src.repositories.user import UserRepository
 from src.models.user import UserModel
-from src.config.redis import Client
+from src import redis_client
 from typing import List
 import json
 from src.libs.response import error
@@ -79,7 +79,7 @@ class Authenticate():
                     token = request.headers['authorization'].split()[1]
                     
                     # get cached redis user
-                    user = json.loads(Client.get(token))
+                    user = json.loads(redis_client.get(token))
                     
                     print(user)
                     

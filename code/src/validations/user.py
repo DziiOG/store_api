@@ -17,7 +17,7 @@ class UserSignUpValidation(Schema):
     
 
 class UserLoginValidation(Schema):
-    username = fields.String(required=True)
+    email = fields.Email(required=True, validate=validate.Email(error="Please provide valid email"))
     password = fields.String(required=True)
 
 class UserQueryValidation(Schema):
