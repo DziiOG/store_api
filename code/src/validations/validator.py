@@ -1,10 +1,10 @@
 from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
 from src.models.user import UserModel
-from src import app
 from src.libs import response
 from flask import request, g
 from functools import wraps
+from src import app
 
 class Validator():
     """ Class Validator contains static methods for performing validation operations on methods in resources """
