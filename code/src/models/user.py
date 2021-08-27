@@ -9,8 +9,8 @@ import jwt
 import os
 
 
-
 class UserModel(db.Document):
+    email = db.StringField(required=True, unique=True)
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
     status = db.EnumField(enum=Status, default=Status.IN_ACTIVE)
@@ -34,10 +34,11 @@ class UserModel(db.Document):
     def update(self, *args, **kwargs):
         self.modified_date = datetime.now()
         return super(UserModel, self).update(*args, **kwargs)
-    
+
     def to_dict(self):
         return dict(
             _id=str(self.pk),
+            email=self.email,
             username=self.username,
             status=self.status,
             roles=self.roles,
@@ -46,42 +47,38 @@ class UserModel(db.Document):
         )
 
     def check_password_correction(self, attempted_password):
-            return bcrypt.check_password_hash(self.password, attempted_password)
+        return bcrypt.check_password_hash(self.password, attempted_password)
 
     @staticmethod
-    def encode_auth_token(user_id, days=3, seconds=0):
+    def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
         """ Generates the Auth Token :return: string  """
         try:
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
                 'iat': datetime.utcnow(),
-                'sub': user_id
+                'sub': str(dict(user_id=user_id, email=email)).encode('utf-8')
             }
-            
-            return jwt.encode(
+            auth_token = jwt.encode(
                 payload,
                 CONFIG.SECRET_KEY,
                 algorithm='HS256'
             )
+            return dict(auth_token=auth_token)
         except Exception as e:
             raise e
-
 
     @staticmethod
     def compare_password(password, comparant_password):
         return safe_str_cmp(password, comparant_password)
 
-
     @classmethod
     def getUser(cls, user_id):
         try:
-            user = cls.objects().get(id=user_id)  
+            user = cls.objects().get(id=user_id)
             if user:
-                return user.to_dict()      
+                return user.to_dict()
         except Exception as error:
             raise error
-
-
 
     @classmethod
     def decode_auth_token(cls, auth_token):
@@ -92,18 +89,14 @@ class UserModel(db.Document):
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
             # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
-            
             if payload:
                 return True
-            
+
             return False
 
         except jwt.ExpiredSignatureError:
             raise Exception('token has expired. Please log in again.')
 
-
         except jwt.InvalidTokenError:
 
-            raise Exception('Invalid token. Please log in again.')  
-
-
+            raise Exception('Invalid token. Please log in again.')
