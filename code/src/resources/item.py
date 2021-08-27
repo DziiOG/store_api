@@ -8,16 +8,16 @@ from flask import request, g
 class ItemResource(Resource):
     """ ItemResouce class contains methods for getting, deleting and updating single item ITem """
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     def get(self, id: str):
         return ItemController().get_by_id(id)
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     @Validator.validate(ItemPatchBodyValidation())
     def patch(self, id: str):
         return ItemController().update(id, **g.body)
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     def delete(self, id: str):
         return ItemController().delete(id)
 
@@ -25,12 +25,12 @@ class ItemResource(Resource):
 class ItemListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     @Validator.validate(ItemParamsValidation(), "params")
     def get(self):
         return ItemController().get_docs(**g.params)
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     @Validator.validate(ItemBodyValidation())
     def post(self):
         return ItemController().insert(**g.body)
@@ -38,7 +38,7 @@ class ItemListResource(Resource):
 
 class ItemStoreResource(Resource):
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     @Validator.validate(validator=ItemParamsValidation(), validation_data="params")
     def get(self, id):
         return ItemController().stores_by_item(id)

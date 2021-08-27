@@ -21,7 +21,7 @@ class BaseConfiguration(object):
     # Default App Settings
     HOST = os.getenv('DEV_HOST')
     PORT = os.getenv('DEV_PORT')
-
+    
     ALLOWED_ORIGINS : str = os.getenv("ALLOWED_ORIGINS")
 
     # SMTP Configuration
@@ -43,6 +43,7 @@ class TestConfig(BaseConfiguration):
     MONGODB_DB : str = os.getenv('TEST_DB')
     HOST  = os.getenv('TEST_HOST')
     PORT = os.getenv('TEST_PORT')
+    
 
 
 class DevConfig(BaseConfiguration):
@@ -52,6 +53,9 @@ class DevConfig(BaseConfiguration):
     """
     DEBUG : bool = True
     TESTING : bool = False
+    REDIS_PASS = os.getenv('DEV_REDIS_PASS')
+    REDIS_HOST = os.getenv('DEV_REDIS_HOST')
+    REDIS_PORT = os.getenv('DEV_REDIS_PORT')
 
 
 class ProdConfig(BaseConfiguration):

@@ -1,7 +1,7 @@
 from werkzeug.security import safe_str_cmp
+from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
 from marshmallow import ValidationError
-from src.helpers.misc import Status
 from src.config.config import CONFIG
 from src.config.db import db
 from src import bcrypt
@@ -14,6 +14,7 @@ class UserModel(db.Document):
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
     status = db.EnumField(enum=Status, default=Status.IN_ACTIVE)
+    roles = db.EnumField(enum=ROLES, required=True)
     creation_date = db.DateTimeField()
     modified_date = db.DateTimeField(default=datetime.now)
 
@@ -39,6 +40,7 @@ class UserModel(db.Document):
             _id=str(self.pk),
             username=self.username,
             status=self.status,
+            roles=self.roles,
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )
@@ -90,7 +92,11 @@ class UserModel(db.Document):
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
             # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
-            return cls.getUser(payload['sub'])
+            
+            if payload:
+                return True
+            
+            return False
 
         except jwt.ExpiredSignatureError:
             raise Exception('token has expired. Please log in again.')

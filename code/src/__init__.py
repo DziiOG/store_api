@@ -1,11 +1,13 @@
-from src.config.config import CONFIG
-from src.config.db import initialise_db
+from src.config.redis import connect_to_redis
 from flask_restful import Resource, Api
+from src.config.db import initialise_db
+from src.config.config import CONFIG
 from flask import Flask, Blueprint
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt import JWT
 import logging
+import redis
 import os
 
 #flask application initialization
@@ -70,6 +72,8 @@ api = Api(app=app, prefix="/api/v1")
 #initialise db
 initialise_db(app=app, CONFIG=CONFIG)
 
+
+connect_to_redis(redis=redis, CONFIG=CONFIG, app=app)
 
 #return resources
 from src.routes import endpoints

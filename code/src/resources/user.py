@@ -20,7 +20,7 @@ class UserSignUpResource(Resource):
            
 class UserListResource(Resource):
 
-    @Authenticate.is_authenticated_or_authorised()
+    @Authenticate.auth()
     @Validator.validate(validator=UserQueryValidation(), validation_data="params")
     def get(self):
             return UserController().get_docs(**g.params)
