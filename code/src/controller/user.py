@@ -55,3 +55,13 @@ class UserController(BaseController):
         except Exception as error:
             app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
+        
+        
+    def logout(self):
+        try:
+            pass
+            
+        except Exception as error:
+            app.logger.error(error)
+            return self.response.error(message=str(error), statusCode=400), 400
+            

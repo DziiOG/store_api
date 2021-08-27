@@ -1,6 +1,7 @@
 from werkzeug.security import safe_str_cmp
 from datetime import datetime, timedelta
 from marshmallow import ValidationError
+from src.helpers.misc import Status
 from src.config.config import CONFIG
 from src.config.db import db
 from src import bcrypt
@@ -8,9 +9,11 @@ import jwt
 import os
 
 
+
 class UserModel(db.Document):
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
+    status = db.EnumField(enum=Status, default=Status.IN_ACTIVE)
     creation_date = db.DateTimeField()
     modified_date = db.DateTimeField(default=datetime.now)
 
@@ -35,6 +38,7 @@ class UserModel(db.Document):
         return dict(
             _id=str(self.pk),
             username=self.username,
+            status=self.status,
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )
