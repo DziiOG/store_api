@@ -11,7 +11,6 @@ class CacheUser():
     def cache_user(authToken: str, user: dict):
         try:
             redis_client.set(authToken, json.dumps(user))
-            print("red")
         except ConnectionError as err:
             app.logger.error(err)
         except AuthenticationError as err:

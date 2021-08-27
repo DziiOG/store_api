@@ -26,6 +26,7 @@ class ItemListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
     @Authenticate.auth()
+    @Authenticate.access(['ADMIN'])
     @Validator.validate(ItemParamsValidation(), "params")
     def get(self):
         return ItemController().get_docs(**g.params)

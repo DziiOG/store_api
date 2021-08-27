@@ -50,7 +50,6 @@ class UserController(BaseController):
                 if is_correct:
                     data = user[0].encode_auth_token(
                         user_id=user[0].to_dict().get('_id', None), email=user[0].to_dict().get('email', None))
-                    print(user)
                     CacheUser.cache_user(data['auth_token'], user[0].to_dict()) 
                     response_data = dict(
                         **user[0].to_dict(),

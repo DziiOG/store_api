@@ -1,12 +1,12 @@
 from src.repositories.user import UserRepository
 from src.models.user import UserModel
-from src import redis_client
-from typing import List
-import json
 from src.libs.response import error
+from src import redis_client
 from flask import request, g
 from functools import wraps
+from typing import List
 from src import app
+import json
 
 
 #################################################################
@@ -26,12 +26,10 @@ class Authenticate():
         
         """A wrapper to authorize user to access endpoints provided they have certain roles
         """
-        def access_decorator():
+        def access_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
                try: 
-                   #set allowed to be false
-                    allowed = False
                     #if there is a user making request
                     if g.user:
                         
@@ -41,21 +39,20 @@ class Authenticate():
                             #there is a role matches required roles to access resource
                             if role in roles:
                                 #set allowed to be true
-                                allowed = True
                                 
                                 #append user to global g
                                 g.user = user
                                 
+                                return func(*args, **kwargs)
+                                
+                                
                                 #break from loop
-                                break
                         # if no role matches any
-                        if not allowed:
                             
-                            # return forbidden 
-                            return error("Forbidden", statusCode=403), 403
+                        # return forbidden 
+                        return error("Forbidden", statusCode=403), 403
                         
                         #return the next function
-                        return func(*args, **kwargs)
                     
                     # raise this exception
                     raise Exception("Something went wrong processing request")
@@ -81,7 +78,6 @@ class Authenticate():
                     # get cached redis user
                     user = json.loads(redis_client.get(token))
                     
-                    print(user)
                     
                     #decode token
                     isVerified = UserModel.decode_auth_token(token)
