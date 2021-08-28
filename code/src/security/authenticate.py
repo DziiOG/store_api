@@ -29,7 +29,7 @@ class Authenticate():
             @wraps(func)
             def wrapper(*args, **kwargs):
                 try:
-                    # if there is a user making request
+                    # check roles
                     for role in roles:
                         if role == g.user.get('roles', None):
                             return func(*args, **kwargs)
