@@ -29,9 +29,8 @@ class Authenticate():
             @wraps(func)
             def wrapper(*args, **kwargs):
                 try:
-                    # if there is a user making request
+                    # check roles
                     for role in roles:
-                        print(roles)
                         if role == g.user.get('roles', None):
                             return func(*args, **kwargs)
                     return response.forbidden(), 403
@@ -52,19 +51,21 @@ class Authenticate():
                 try:
                     # get request header and split it into two. specificatlly authorisation header Bearer and token
                     token = request.headers['authorization'].split()[1]
-
+                    redis_user = redis_client.get(token)
+                    if redis_user:
                     # get cached redis user
-                    user = json.loads(redis_client.get(token))
+                        user = json.loads(redis_user)
 
-                    # decode token
-                    isVerified = UserModel.decode_auth_token(token)
+                        # decode token
+                        isVerified = UserModel.decode_auth_token(token)
 
-                    # store user if verified
-                    if isVerified:
-                        g.user = user
-                        return func(*args, **kwargs)
-                    else:
-                        return unauthorized(), 401
+                        # store user if verified
+                        if isVerified:
+                            g.user = user
+                            return func(*args, **kwargs)
+                        else:
+                            return unauthorized(), 401
+                    return unauthorized(), 401
 
                 except KeyError as err:
                     # log error

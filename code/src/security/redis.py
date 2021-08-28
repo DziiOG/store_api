@@ -1,4 +1,4 @@
-from src import redis_client
+from src import redis_client, app
 from src.libs.response import error
 from flask import jsonify
 import json
@@ -22,7 +22,7 @@ class CacheUser():
     
     def remove_cached_user(token):
         try:
-            redis_client.delete(str(authToken))
+            redis_client.delete(token)
         except ConnectionError as err:
             app.logger.error(err)
         except AuthenticationError as err:

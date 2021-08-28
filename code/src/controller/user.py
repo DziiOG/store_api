@@ -2,7 +2,7 @@ from src.repositories.user import UserRepository
 from src.controller.base import BaseController
 from src.security.redis import CacheUser
 from functools import wraps
-from flask import g
+from flask import g, request
 from src import app
 
 
@@ -11,6 +11,8 @@ class UserController(BaseController):
         self.name = 'User'
         self.repository = UserRepository()
         super().__init__(name=self.name, repository=self.repository)
+        
+        
         
     def sign_up(self, **payload):
         try:
@@ -64,8 +66,8 @@ class UserController(BaseController):
 
     def logout(self):
         try:
-            pass
-
+            CacheUser.remove_cached_user(request.headers['authorization'].split()[1])
+            return self.response.success(message="User logged out successfully")
         except Exception as error:
             app.logger.error(error)
             return self.response.error(message=str(error), statusCode=400), 400
