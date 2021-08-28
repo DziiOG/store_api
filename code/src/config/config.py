@@ -14,15 +14,15 @@ class BaseConfiguration(object):
     DEBUG = False
     TESTING = False
     # Application secret key
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY : str = os.getenv('SECRET_KEY')
     # DB Settings
-    MONGODB_DB_URL = os.getenv('DB_URI')
+    MONGODB_DB_URL : str = os.getenv('DB_URI')
     MONGODB_DB = os.getenv('DEV_DB')
     # Default App Settings
     HOST = os.getenv('DEV_HOST')
     PORT = os.getenv('DEV_PORT')
-
-    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+    
+    ALLOWED_ORIGINS : str = os.getenv("ALLOWED_ORIGINS")
 
     # SMTP Configuration
     MAIL_SERVER = os.getenv('DEV_MAIL_SERVER')
@@ -40,9 +40,10 @@ class TestConfig(BaseConfiguration):
     TESTING = True
     DEBUG = True
     # DB Settings
-    MONGODB_DB = os.getenv('TEST_DB')
-    HOST = os.getenv('TEST_HOST')
+    MONGODB_DB : str = os.getenv('TEST_DB')
+    HOST  = os.getenv('TEST_HOST')
     PORT = os.getenv('TEST_PORT')
+    
 
 
 class DevConfig(BaseConfiguration):
@@ -50,8 +51,11 @@ class DevConfig(BaseConfiguration):
     Development configuration uses default configuration
     from base configuration for DB and Server
     """
-    DEBUG = True
-    TESTING = False
+    DEBUG : bool = True
+    TESTING : bool = False
+    REDIS_PASS = os.getenv('DEV_REDIS_PASS')
+    REDIS_HOST = os.getenv('DEV_REDIS_HOST')
+    REDIS_PORT = os.getenv('DEV_REDIS_PORT')
 
 
 class ProdConfig(BaseConfiguration):
@@ -60,7 +64,7 @@ class ProdConfig(BaseConfiguration):
     """
 
 
-get_config = dict(
+get_config : dict = dict(
     DEV=DevConfig,
     TEST=TestConfig,
     PROD=ProdConfig

@@ -1,12 +1,13 @@
 
 from src.validations.store import StoreBodyValidation, StoreParamsValidation, StorePatchBodyValidation, StoreItemPatchBodyValidation
-from src.security.authenticate import Authenticate
+from src.security.authenticate import guard, access
 from src.repositories.store import StoreRepository
 from src.controller.store import StoreController
-from src.validations.validator import Validator
+from src.validations.validator import serialize
 from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
 from src.models.store import StoreModel
+from src.helpers.misc import ROLES
 from flask_restful import Resource
 from src.libs import response
 from flask import request, g
@@ -14,36 +15,42 @@ from flask import request, g
 class StoreResource(Resource):
     """ StoreResouce class contains methods for getting, deleting and updating single store """
 
-    @Authenticate.is_authenticated_or_authorised()
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
     def get(self, id: str):            
         return StoreController().get_by_id(id)
     
-    @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StorePatchBodyValidation())
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(validator=StorePatchBodyValidation())
     def patch(self, id: str):
             return StoreController().update(id, **g.body)
 
-    @Authenticate.is_authenticated_or_authorised()
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
     def delete(self, id: str):
         return StoreController().delete(id)
        
 class StoreListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
-    @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StoreParamsValidation(), validation_data="params")
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(validator=StoreParamsValidation(), validation_data="params")
     def get(self):
         return StoreController().get_docs(**g.params)
 
-    @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StoreBodyValidation())
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(validator=StoreBodyValidation())
     def post(self):
         return StoreController().insert(**g.body)
 
 
 class StoreItemResource(Resource):
-    @Authenticate.is_authenticated_or_authorised()
-    @Validator.validate(validator=StoreItemPatchBodyValidation())
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(validator=StoreItemPatchBodyValidation())
     def patch(self, id):
         return StoreController().update_items(id, **g.body)
     

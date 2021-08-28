@@ -1,4 +1,5 @@
 from werkzeug.security import safe_str_cmp
+from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
 from marshmallow import ValidationError
 from src.config.config import CONFIG
@@ -9,15 +10,15 @@ import os
 
 
 class UserModel(db.Document):
+    email = db.StringField(required=True, unique=True)
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
+    status = db.EnumField(enum=Status, default=Status.IN_ACTIVE)
+    roles = db.EnumField(enum=ROLES, required=True)
     creation_date = db.DateTimeField()
     modified_date = db.DateTimeField(default=datetime.now)
 
     def clean(self):
-        if self.password is not None:
-            if len(self.password) < 6:
-                raise ValidationError("Password should be more than 6")
         self.password = bcrypt.generate_password_hash(
             self.password).decode('utf-8')
 
@@ -30,52 +31,52 @@ class UserModel(db.Document):
     def update(self, *args, **kwargs):
         self.modified_date = datetime.now()
         return super(UserModel, self).update(*args, **kwargs)
-    
+
     def to_dict(self):
         return dict(
             _id=str(self.pk),
+            email=self.email,
             username=self.username,
+            status=str(self.status.value),
+            roles=str(self.roles.value),
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )
 
     def check_password_correction(self, attempted_password):
-            return bcrypt.check_password_hash(self.password, attempted_password)
+        return bcrypt.check_password_hash(self.password, attempted_password)
 
     @staticmethod
-    def encode_auth_token(user_id, days=3, seconds=0):
+    def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
         """ Generates the Auth Token :return: string  """
         try:
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
                 'iat': datetime.utcnow(),
-                'sub': user_id
+                'sub': dict(user_id=user_id, email=email)
             }
-            
-            return jwt.encode(
+            auth_token = jwt.encode(
                 payload,
                 CONFIG.SECRET_KEY,
                 algorithm='HS256'
             )
+                        
+            return dict(auth_token=auth_token)
         except Exception as e:
             raise e
-
 
     @staticmethod
     def compare_password(password, comparant_password):
         return safe_str_cmp(password, comparant_password)
 
-
     @classmethod
     def getUser(cls, user_id):
         try:
-            user = cls.objects().get(id=user_id)  
+            user = cls.objects().get(id=user_id)
             if user:
-                return user.to_dict()      
+                return user.to_dict()
         except Exception as error:
             raise error
-
-
 
     @classmethod
     def decode_auth_token(cls, auth_token):
@@ -86,14 +87,14 @@ class UserModel(db.Document):
             payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
             # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
-            return cls.getUser(payload['sub'])
+            if payload:
+                return True
+
+            return False
 
         except jwt.ExpiredSignatureError:
             raise Exception('token has expired. Please log in again.')
 
-
         except jwt.InvalidTokenError:
 
-            raise Exception('Invalid token. Please log in again.')  
-
-
+            raise Exception('Invalid token. Please log in again.')

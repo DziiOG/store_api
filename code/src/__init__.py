@@ -1,11 +1,13 @@
-from src.config.config import CONFIG
-from src.config.db import initialise_db
+from redis.exceptions import ConnectionError, AuthenticationError
 from flask_restful import Resource, Api
+from src.config.db import initialise_db
+from src.config.config import CONFIG
 from flask import Flask, Blueprint
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt import JWT
 import logging
+import redis
 import os
 
 #flask application initialization
@@ -70,6 +72,15 @@ api = Api(app=app, prefix="/api/v1")
 #initialise db
 initialise_db(app=app, CONFIG=CONFIG)
 
+
+try:
+    redis_client = redis.Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=0)
+    if redis_client.ping():
+        app.logger.info(f"Connected to Redis on {CONFIG.REDIS_HOST}".format()) 
+except ConnectionError as err:
+    app.logger.error(err)
+except AuthenticationError as err:
+    app.logger.error(err)
 
 #return resources
 from src.routes import endpoints
