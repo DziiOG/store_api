@@ -27,3 +27,10 @@ class UserListResource(Resource):
     @serialize(validator=UserQueryValidation(), validation_data="params")
     def get(self):
             return UserController().get_docs(**g.params)
+        
+        
+        
+class UserLogoutResource(Resource):
+    @guard()
+    def post(self):
+        return UserController().logout()
