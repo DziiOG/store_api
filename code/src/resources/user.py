@@ -1,19 +1,20 @@
 from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
-from src.security.authenticate import Authenticate
-from src.validations.validator import Validator
+from src.validations.validator import serialize, Validator
+from src.security.authenticate import guard, access
 from src.controller.user import UserController
+from src.helpers.misc import ROLES
 from flask_restful import Resource
 from flask import request, g
 
 class UserLoginResource(Resource):
 
-    @Validator.validate(validator=UserLoginValidation())
+    @serialize(validator=UserLoginValidation())
     def post(self):
         return UserController().login(**g.body)
 
 class UserSignUpResource(Resource):
 
-    @Validator.validate(validator=UserSignUpValidation())
+    @serialize(validator=UserSignUpValidation())
     @Validator.validate_password()
     @Validator.username_or_email_exists()
     def post(self):
@@ -21,7 +22,8 @@ class UserSignUpResource(Resource):
            
 class UserListResource(Resource):
 
-    @Authenticate.auth()
-    @Validator.validate(validator=UserQueryValidation(), validation_data="params")
+    @guard()
+    @access([ROLES.ADMIN.value])
+    @serialize(validator=UserQueryValidation(), validation_data="params")
     def get(self):
             return UserController().get_docs(**g.params)

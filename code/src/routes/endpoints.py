@@ -15,9 +15,9 @@ api.add_resource(ItemListResource, '/items')
 
 
 #User Resources
-api.add_resource(UserSignUpResource, '/signup')
+api.add_resource(UserSignUpResource, '/users/signup')
 api.add_resource(UserListResource, '/users')
-api.add_resource(UserLoginResource, '/login')
+api.add_resource(UserLoginResource, '/users/login')
 
 
 api.add_resource(StoreResource, '/stores/<string:id>')

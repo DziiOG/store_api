@@ -87,3 +87,5 @@ class Validator():
         return username_or_email_exist_decorator
 
     
+    
+serialize = Validator.validate

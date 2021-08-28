@@ -1,23 +1,27 @@
 from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
-from src.security.authenticate import Authenticate
-from src.validations.validator import Validator
+from src.security.authenticate import guard, access
+from src.validations.validator import serialize
 from src.controller.item import ItemController
+from src.helpers.misc import ROLES
 from flask_restful import Resource
 from flask import request, g
 
 class ItemResource(Resource):
     """ ItemResouce class contains methods for getting, deleting and updating single item ITem """
 
-    @Authenticate.auth()
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
     def get(self, id: str):
         return ItemController().get_by_id(id)
 
-    @Authenticate.auth()
-    @Validator.validate(ItemPatchBodyValidation())
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(ItemPatchBodyValidation())
     def patch(self, id: str):
         return ItemController().update(id, **g.body)
 
-    @Authenticate.auth()
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
     def delete(self, id: str):
         return ItemController().delete(id)
 
@@ -25,22 +29,24 @@ class ItemResource(Resource):
 class ItemListResource(Resource):
     """ ItemListResouce class contains methods for getting and creating Item resouce """
 
-    @Authenticate.auth()
-    @Authenticate.access(['ADMIN'])
-    @Validator.validate(ItemParamsValidation(), "params")
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(ItemParamsValidation(), "params")
     def get(self):
         return ItemController().get_docs(**g.params)
 
-    @Authenticate.auth()
-    @Validator.validate(ItemBodyValidation())
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(ItemBodyValidation())
     def post(self):
         return ItemController().insert(**g.body)
 
 
 class ItemStoreResource(Resource):
 
-    @Authenticate.auth()
-    @Validator.validate(validator=ItemParamsValidation(), validation_data="params")
+    @guard()
+    @access([ROLES.REGULER_USER.value, ROLES.ADMIN.value])
+    @serialize(validator=ItemParamsValidation(), validation_data="params")
     def get(self, id):
         return ItemController().stores_by_item(id)
 
