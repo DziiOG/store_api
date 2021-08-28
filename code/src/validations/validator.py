@@ -1,4 +1,3 @@
-from src.validations.misc import Miscellaneous
 from marshmallow import ValidationError
 from src.models.user import UserModel
 from src.libs import response
@@ -57,6 +56,7 @@ class Validator():
                        raise Exception("confirm password must be equal to password")
                 except Exception as error:
                     # return exception with error message
+                    app.logger.error(error)
                     return response.error(message=str(error)), 400
             #return wrapper
             return wrapper

@@ -2,7 +2,6 @@ from werkzeug.exceptions import HTTPException
 from src.config.config import CONFIG
 from flask import json
 from src import app
-import os
 
 # Handle generic request exceptions here
 

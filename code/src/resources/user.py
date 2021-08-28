@@ -4,7 +4,7 @@ from src.security.authenticate import guard, access
 from src.controller.user import UserController
 from src.helpers.misc import ROLES
 from flask_restful import Resource
-from flask import request, g
+from flask import g
 
 class UserLoginResource(Resource):
 

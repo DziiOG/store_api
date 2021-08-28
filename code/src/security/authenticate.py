@@ -1,8 +1,5 @@
-from src.repositories.user import UserRepository
-from werkzeug.security import safe_str_cmp
+from src.libs.response import error, unauthorized, forbidden
 from src.models.user import UserModel
-from src.libs.response import error, unauthorized
-from src.libs import response
 from src import redis_client
 from flask import request, g
 from functools import wraps
@@ -33,7 +30,7 @@ class Authenticate():
                     for role in roles:
                         if role == g.user.get('roles', None):
                             return func(*args, **kwargs)
-                    return response.forbidden(), 403
+                    return forbidden(), 403
                 except Exception as error:
                     app.logger.error(error)
                     return error(message=str(error), statusCode=500), 500

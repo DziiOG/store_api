@@ -1,7 +1,6 @@
 from src.repositories.user import UserRepository
 from src.controller.base import BaseController
 from src.security.redis import CacheUser
-from functools import wraps
 from flask import g, request
 from src import app
 

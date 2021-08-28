@@ -1,8 +1,7 @@
-from src import redis_client, app
-from src.libs.response import error
-from flask import jsonify
-import json
 from redis.exceptions import AuthenticationError, ConnectionError
+from src.libs.response import error
+from src import redis_client, app
+import json
 
 
 class CacheUser():

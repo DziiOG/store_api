@@ -1,12 +1,10 @@
 from werkzeug.security import safe_str_cmp
 from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
-from marshmallow import ValidationError
 from src.config.config import CONFIG
 from src.config.db import db
 from src import bcrypt
 import jwt
-import os
 
 
 class UserModel(db.Document):

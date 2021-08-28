@@ -4,7 +4,7 @@ from src.validations.validator import serialize
 from src.controller.item import ItemController
 from src.helpers.misc import ROLES
 from flask_restful import Resource
-from flask import request, g
+from flask import g
 
 class ItemResource(Resource):
     """ ItemResouce class contains methods for getting, deleting and updating single item ITem """
