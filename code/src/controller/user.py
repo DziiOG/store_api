@@ -2,6 +2,7 @@ from src.repositories.user import UserRepository
 from src.controller.base import BaseController
 from src.security.redis import CacheUser
 from flask import g, request
+from functools import wraps
 from src import app
 
 
@@ -11,36 +12,26 @@ class UserController(BaseController):
         self.repository = UserRepository()
         super().__init__(name=self.name, repository=self.repository)
         
-        
-        
-    def sign_up(self, **payload):
-        try:
-            # check if user already exists by using username
-            email = payload.get('email', None)
-            
-            data = self.repository.get_docs(email=email)
-            
-            if data is not None:
-                # if user exist raise an exception
-                raise Exception("User already exists")
-            else:
-                if payload.get('status', None):
-                    del payload['status']
+    @staticmethod
+    def pre_insert():
+        def pre_insert_decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                #if status
+                if g.body.get('status', None):
                     
-                del payload['confirm_password']
-                # insert new user's data
-                result = self.repository.insert(**payload)
+                    #delete status
+                    del g.body['status']
+                    
+                # delete confirm password in request body
+                del g.body['confirm_password']
                 
-                # if result return user created details
-                return self.response.successWithData(data=result, message=f"{self.name} created succesfully", statusCode=201), 201
-        except Exception as error:
-            # log the error
-            app.logger.error(error)
-            # return response with error messsage
-            return self.response.error(message=str(error), statusCode=400), 400
-
+                #return next function
+                return func(*args, **kwargs)
+            return wrapper
+        return pre_insert_decorator
+          
     def login(self, **payload):
-        try:
             email = payload.get('email')
             password = payload.get('password')
             user = self.repository.get_docs(raw=True, email=email)
@@ -59,14 +50,7 @@ class UserController(BaseController):
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200
                 return self.response.error(message="Incorrect Credentials, Please try again"), 400
 
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
-
     def logout(self):
-        try:
             CacheUser.remove_cached_user(request.headers['authorization'].split()[1])
             return self.response.success(message="User logged out successfully")
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+       

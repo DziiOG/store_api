@@ -47,34 +47,25 @@ class UserModel(db.Document):
     @staticmethod
     def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
         """ Generates the Auth Token :return: string  """
-        try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
-                'iat': datetime.utcnow(),
-                'sub': dict(user_id=user_id, email=email)
-            }
-            auth_token = jwt.encode(
-                payload,
-                CONFIG.SECRET_KEY,
-                algorithm='HS256'
-            )
-                        
-            return dict(auth_token=auth_token)
-        except Exception as e:
-            raise e
+        payload = {
+            'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
+            'iat': datetime.utcnow(),
+            'sub': dict(user_id=user_id, email=email)
+        }
+        auth_token = jwt.encode(
+            payload,
+            CONFIG.SECRET_KEY,
+            algorithm='HS256'
+        )
+                    
+        return dict(auth_token=auth_token)
+    
 
     @staticmethod
     def compare_password(password, comparant_password):
         return safe_str_cmp(password, comparant_password)
 
-    @classmethod
-    def getUser(cls, user_id):
-        try:
-            user = cls.objects().get(id=user_id)
-            if user:
-                return user.to_dict()
-        except Exception as error:
-            raise error
+   
 
     @classmethod
     def decode_auth_token(cls, auth_token):

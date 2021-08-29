@@ -1,5 +1,5 @@
 from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
-from src.validations.validator import serialize, Validator
+from src.validations.validator import serialize, Validator, exists
 from src.security.authenticate import guard, access
 from src.controller.user import UserController
 from src.helpers.misc import ROLES
@@ -13,12 +13,12 @@ class UserLoginResource(Resource):
         return UserController().login(**g.body)
 
 class UserSignUpResource(Resource):
-
     @serialize(validator=UserSignUpValidation())
+    @exists(['username', 'email'])
     @Validator.validate_password()
-    @Validator.username_or_email_exists()
+    @UserController().pre_insert()
     def post(self):
-        return UserController().sign_up(**g.body)
+        return UserController().insert(**g.body)
            
 class UserListResource(Resource):
 
