@@ -2,7 +2,7 @@
 endpoints module contains api resources and application routes for accessing those resouces
 """
 
-from src.resources.user import UserSignUpResource, UserListResource, UserLoginResource, UserLogoutResource
+from src.resources.user import UserSignUpResource, UserListResource, UserLoginResource, UserLogoutResource, UserActivationResource
 from src.resources.store import StoreResource, StoreListResource, StoreItemResource
 from src.resources.item import ItemResource, ItemListResource, ItemStoreResource
 from src import api
@@ -18,6 +18,7 @@ api.add_resource(ItemListResource, '/items')
 api.add_resource(UserSignUpResource, '/users/signup')
 api.add_resource(UserListResource, '/users')
 api.add_resource(UserLoginResource, '/users/login')
+api.add_resource(UserActivationResource, '/users/verify-account/activate')
 api.add_resource(UserLogoutResource, '/users/logout')
 
 

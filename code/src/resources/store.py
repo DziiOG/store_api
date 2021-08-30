@@ -2,7 +2,7 @@
 from src.validations.store import StoreBodyValidation, StoreParamsValidation, StorePatchBodyValidation, StoreItemPatchBodyValidation
 from src.security.authenticate import guard, access
 from src.controller.store import StoreController
-from src.validations.validator import serialize
+from src.validations import serialize
 from src.helpers.misc import ROLES
 from flask_restful import Resource
 from flask import g

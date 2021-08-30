@@ -1,8 +1,8 @@
 from src.models.user import UserModel
-from typing import List
 from src.libs import response
 from flask import request, g
 from functools import wraps
+from typing import List
 from src import app
 
 class Validator():
@@ -72,3 +72,4 @@ class Validator():
     
 serialize = Validator.validate
 exists = Validator.exists
+validate_password = Validator.validate_password

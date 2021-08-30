@@ -1,7 +1,7 @@
 from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
 from src.security.authenticate import guard, access
-from src.validations.validator import serialize
 from src.controller.item import ItemController
+from src.validations import serialize
 from src.helpers.misc import ROLES
 from flask_restful import Resource
 from flask import g

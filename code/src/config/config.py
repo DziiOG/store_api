@@ -29,6 +29,9 @@ class BaseConfiguration(object):
     MAIL_PORT = os.getenv('DEV_MAIL_PORT')
     MAIL_USERNAME = os.getenv('DEV_MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('DEV_MAIL_PASSWORD')
+    MAILGUN_EMAIL = os.getenv('MAILGUN_EMAIL')
+    MAILGUN_API_BASE_URL = os.getenv('MAILGUN_API_BASE_URL')
+    MAILGUN_API_KEY = os.getenv('MAILGUN_API_KEY')
 
 
 class TestConfig(BaseConfiguration):

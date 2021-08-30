@@ -1,5 +1,7 @@
 from src.repositories.user import UserRepository
 from src.controller.base import BaseController
+from src.security.authenticate import verify_token
+from src.helpers.misc import Status
 from src.security.redis import CacheUser
 from flask import g, request
 from functools import wraps
@@ -11,46 +13,96 @@ class UserController(BaseController):
         self.name = 'User'
         self.repository = UserRepository()
         super().__init__(name=self.name, repository=self.repository)
-        
+
     @staticmethod
     def pre_insert():
+        """A wrapper to help registering users
+        """
         def pre_insert_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                #if status
+                # if status
                 if g.body.get('status', None):
-                    
-                    #delete status
+
+                    # delete status
                     del g.body['status']
-                    
+
                 # delete confirm password in request body
                 del g.body['confirm_password']
-                
-                #return next function
+
+                # return next function
                 return func(*args, **kwargs)
             return wrapper
         return pre_insert_decorator
-          
+
     def login(self, **payload):
-            email = payload.get('email')
-            password = payload.get('password')
-            user = self.repository.get_docs(raw=True, email=email)
-            if user is None:
-                raise Exception("Incorrect Credentials, Please try again")
-            else:
-                is_correct = user[0].check_password_correction(password)
-                if is_correct:
-                    data = user[0].encode_auth_token(
-                        user_id=user[0].to_dict().get('_id', None), email=user[0].to_dict().get('email', None))
-                    CacheUser.cache_user(data['auth_token'], user[0].to_dict()) 
+        """A controller method to login users 
+        """
+        # get user email
+        email = payload.get('email')
+
+        # get user password
+        password = payload.get('password')
+
+        # find user with email
+        docs = self.repository.get_docs(email=email)
+
+        # if there's no user
+        if docs is None:
+
+            # throw this error
+            raise Exception("Incorrect Credentials, Please try again")
+
+        else:
+
+            # assign user
+            user = docs[0]
+
+            # check if password is correct
+            is_correct = user.check_password_correction(password)
+
+            # if correct
+            if is_correct:
+
+                # check if user has been activated
+                if user.status.value == Status.ACTIVE.value:
+
+                    # generate token
+                    data = user.encode_auth_token(
+                        user_id=user.to_dict().get('_id', None), email=user.to_dict().get('email', None))
+
+                    # cache user to redis
+                    CacheUser.cache_user(data['auth_token'], user.to_dict())
+
+                    # initialise response
                     response_data = dict(
-                        **user[0].to_dict(),
+                        **user.to_dict(),
                         auth_token=data['auth_token'].decode('utf-8')
                     )
+
+                    # return response withe data and token
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200
-                return self.response.error(message="Incorrect Credentials, Please try again"), 400
+
+                # return is user has not been activated
+                return self.response.error(message="User not activated, please check email to activate account and try again", statusCode=400), 400
+
+            # return this error if password is incorrect
+            return self.response.error(message="Incorrect Credentials, Please try again"), 400
+
+    def activate_user(self):
+        params = request.args.to_dict(flat=True)
+        payload = verify_token(auth_token=params.get('token', None))
+        if payload:
+            user_id = payload['sub'].get('user_id', None)
+            user = self.repository.get_by_id(user_id)
+            if user and user.status.value == Status.IN_ACTIVE.value:
+                user.status = Status.ACTIVE.value
+                user.save()
+                return self.response.successWithData(data=user.to_dict(), message="Activated Successfully", statusCode=200), 200
+            raise Exception("Unable to process request")
+        raise Exception("Invalid Token")
 
     def logout(self):
-            CacheUser.remove_cached_user(request.headers['authorization'].split()[1])
-            return self.response.success(message="User logged out successfully")
-       
+        CacheUser.remove_cached_user(
+            request.headers['authorization'].split()[1])
+        return self.response.success(message="User logged out successfully")
