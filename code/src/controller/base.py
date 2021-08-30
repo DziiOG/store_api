@@ -1,17 +1,21 @@
 from src.libs import response
 from typing import Dict
 from src import app
+from pyee import EventEmitter
 
 
-class BaseController:
-    def __init__(self, name: str, repository):
+class BaseController(EventEmitter):
+    def __init__(self, name: str, repository, listening = False):
         self.name = name
+        self.listening = listening
         self.repository = repository
         self.response = response
+        super().__init__()
 
     def insert(self, **payload: Dict) -> Dict:
         data = self.repository.insert(**payload)
         if data:
+            self.listening and self.emit('insert', data)
             return self.response.successWithData(data=data.to_dict(), message=f"{self.name} created succesfully", statusCode=201), 201
 
     def get_by_id(self, id: str) -> Dict:

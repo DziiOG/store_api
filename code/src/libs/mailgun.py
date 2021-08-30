@@ -1,12 +1,13 @@
-from flask import request
-from requests import Response
 from src.config.config import CONFIG
+from requests import Response
+from flask import request
+import requests
 
 
 class MailGun():
     @staticmethod
     def sendMail(to, subject, title, link) -> Response:
-        return request.post(
+        return requests.post(
             f"{CONFIG.MAILGUN_API_BASE_URL}/messages",
             auth=('api', CONFIG.MAILGUN_API_KEY),
             data={

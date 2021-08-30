@@ -1,7 +1,7 @@
 from werkzeug.security import safe_str_cmp
 from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
-from flask import url_for
+from flask import url_for, request
 from requests import Response
 from src.config.config import CONFIG
 from src.config.db import db
@@ -47,9 +47,9 @@ class UserModel(db.Document):
     def check_password_correction(self, attempted_password):
         return bcrypt.check_password_hash(self.password, attempted_password)
 
-    def user_confirmation_mail(self) -> Response:
-        lint = request.url_root[0: -1] + url_for("")
-        return mail_gunner(to, "User Confirmation Mail", "Store Api", FROM_EMAIL, link)
+    def user_confirmation_mail(self, token) -> Response:
+        link = request.url_root[0: -1] + f"/activate-account/activate?token={token.decode('utf-8')}"
+        return mail_gunner(self.email, "User Confirmation Mail", "Store Api", link)
 
     @staticmethod
     def encode_auth_token(user_id: str, email: str, days=3, seconds=0):

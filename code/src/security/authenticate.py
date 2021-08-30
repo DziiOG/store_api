@@ -3,10 +3,10 @@ from src.models.user import UserModel
 from src import redis_client
 from flask import request, g
 from functools import wraps
-import jwt
 from typing import List
 from src import app
 import json
+import jwt
 
 
 #################################################################

@@ -1,21 +1,31 @@
+from src.security.authenticate import verify_token
 from src.repositories.user import UserRepository
 from src.controller.base import BaseController
-from src.security.authenticate import verify_token
-from src.helpers.misc import Status
 from src.security.redis import CacheUser
+from src.helpers.misc import Status
 from flask import g, request
 from functools import wraps
 from src import app
 
 
 class UserController(BaseController):
+    """Contains user controller methods for performing operations on users
+    """
+
     def __init__(self):
         self.name = 'User'
         self.repository = UserRepository()
-        super().__init__(name=self.name, repository=self.repository)
+        self.listening = True
+        super().__init__(name=self.name, repository=self.repository, listening=self.listening)
 
-    @staticmethod
-    def pre_insert():
+        @staticmethod
+        @self.on('insert')
+        def insert_handler(user):
+            data = user.encode_auth_token(
+                user_id=user.to_dict().get('_id', None), email=user.to_dict().get('email', None))
+            user.user_confirmation_mail(data['auth_token'])
+
+    def pre_insert(self):
         """A wrapper to help registering users
         """
         def pre_insert_decorator(func):
@@ -29,7 +39,6 @@ class UserController(BaseController):
 
                 # delete confirm password in request body
                 del g.body['confirm_password']
-
                 # return next function
                 return func(*args, **kwargs)
             return wrapper
