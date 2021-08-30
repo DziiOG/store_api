@@ -1,20 +1,22 @@
-from src.repositories.user import UserRepository
-from werkzeug.security import safe_str_cmp
+from src.libs.response import error, unauthorized, forbidden
 from src.models.user import UserModel
-from src.libs.response import error, unauthorized
-from src.libs import response
 from src import redis_client
 from flask import request, g
 from functools import wraps
 from typing import List
 from src import app
 import json
+import jwt
 
 
 #################################################################
 # This class is responsible for authentication and authorization
 # of users within the API
 ################################################################
+
+verify_token = UserModel.decode_auth_token
+generate_token = UserModel.encode_auth_token
+
 
 class Authenticate():
     @staticmethod
@@ -28,16 +30,11 @@ class Authenticate():
         def required_access_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                try:
-                    # check roles
-                    for role in roles:
-                        if role == g.user.get('roles', None):
-                            return func(*args, **kwargs)
-                    return response.forbidden(), 403
-                except Exception as error:
-                    app.logger.error(error)
-                    return error(message=str(error), statusCode=500), 500
-
+                # check roles
+                for role in roles:
+                    if role == g.user.get('roles', None):
+                        return func(*args, **kwargs)
+                return forbidden(), 403
             return wrapper
         return required_access_decorator
 
@@ -48,37 +45,23 @@ class Authenticate():
         def auth_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                try:
-                    # get request header and split it into two. specificatlly authorisation header Bearer and token
-                    token = request.headers['authorization'].split()[1]
-                    redis_user = redis_client.get(token)
-                    if redis_user:
+                # get request header and split it into two. specificatlly authorisation header Bearer and token
+                token = request.headers['authorization'].split()[1]
+                redis_user = redis_client.get(token)
+                if redis_user:
                     # get cached redis user
-                        user = json.loads(redis_user)
+                    user = json.loads(redis_user)
 
-                        # decode token
-                        isVerified = UserModel.decode_auth_token(token)
+                    # decode token
+                    isVerified = verify_token(token)
 
-                        # store user if verified
-                        if isVerified:
-                            g.user = user
-                            return func(*args, **kwargs)
-                        else:
-                            return unauthorized(), 401
-                    return unauthorized(), 401
-
-                except KeyError as err:
-                    # log error
-                    app.logger.error(err)
-
-                    # return error
-                    return error(message=str(err), statusCode=400), 400
-
-                except Exception as e:
-
-                    app.logger.error(e)
-
-                    return error(message=str(e), statusCode=500), 500
+                    # store user if verified
+                    if isVerified:
+                        g.user = user
+                        return func(*args, **kwargs)
+                    else:
+                        return unauthorized(), 401
+                return unauthorized(), 401
             return wrapper
         return auth_decorator
 

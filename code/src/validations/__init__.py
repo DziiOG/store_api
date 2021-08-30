@@ -1,9 +1,8 @@
-from src.validations.misc import Miscellaneous
-from marshmallow import ValidationError
 from src.models.user import UserModel
 from src.libs import response
 from flask import request, g
 from functools import wraps
+from typing import List
 from src import app
 
 class Validator():
@@ -14,7 +13,6 @@ class Validator():
         def validation_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                try:
                     #validation is params or qquery
                     if validation_data == 'params':
                         #validate with schema template get args as dict
@@ -29,10 +27,7 @@ class Validator():
 
                     #return next function
                     return func(*args, **kwargs)
-                except ValidationError as error:
-                    #return exception with error message
-                    return response.error(message=error.messages, statusCode=400), 400
-
+                
             return wrapper
         return validation_decorator
 
@@ -42,7 +37,6 @@ class Validator():
         def validate_password_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                try:
                    #get user password
                    password = g.body.get('password', None)
                    # get confirm user password
@@ -55,9 +49,7 @@ class Validator():
                    else:
                        #else raise exception
                        raise Exception("confirm password must be equal to password")
-                except Exception as error:
-                    # return exception with error message
-                    return response.error(message=str(error)), 400
+                
             #return wrapper
             return wrapper
         #return the decorator validate_password decorator
@@ -65,27 +57,19 @@ class Validator():
     
     
     @staticmethod
-    def username_or_email_exists():
-        def username_or_email_exist_decorator(func):
+    def exists(keys: List[str]):
+        def exists_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-               try: 
-                    for key in g.body:
-                        if key == 'username':
-                            if UserModel.objects().filter(username=g.body[key]):
-                                raise Exception("Username already exists")
-                            
-                        if key == 'email':
-                            if UserModel.objects().filter(email=g.body[key]):
-                                raise Exception("Email already exists")
-                            
+                    for key in keys:
+                            if UserModel.objects().filter(**{key:g.body[key]}):
+                                raise Exception(f"{key} already exists")
                     return func(*args, **kwargs)
-               except Exception as error:
-                   app.logger.error(error)
-                   return response.error(message=str(error), statusCode=400),400
             return wrapper
-        return username_or_email_exist_decorator
+        return exists_decorator
 
     
     
 serialize = Validator.validate
+exists = Validator.exists
+validate_password = Validator.validate_password

@@ -1,6 +1,5 @@
 
-from marshmallow import Schema, fields, validate, validates, ValidationError, pre_load, validates_schema
-from src.models.user import UserModel
+from marshmallow import Schema, fields, validate, validates
 from src.helpers.misc import ROLES, Status
 from marshmallow_enum import EnumField
 

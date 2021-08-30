@@ -1,15 +1,17 @@
 from werkzeug.security import safe_str_cmp
 from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
-from marshmallow import ValidationError
+from src.libs.mailgun import mail_gunner
 from src.config.config import CONFIG
+from flask import url_for, request
+from requests import Response
 from src.config.db import db
 from src import bcrypt
 import jwt
-import os
 
 
 class UserModel(db.Document):
+    meta = {"collection": "users"}
     email = db.StringField(required=True, unique=True)
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
@@ -46,40 +48,35 @@ class UserModel(db.Document):
     def check_password_correction(self, attempted_password):
         return bcrypt.check_password_hash(self.password, attempted_password)
 
+    def user_confirmation_mail(self, token) -> Response:
+        link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
+        text = f"Please click link to confirm your registration: {link}"
+        html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
+        print(text,)
+        return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
+
     @staticmethod
     def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
         """ Generates the Auth Token :return: string  """
-        try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
-                'iat': datetime.utcnow(),
-                'sub': dict(user_id=user_id, email=email)
-            }
-            auth_token = jwt.encode(
-                payload,
-                CONFIG.SECRET_KEY,
-                algorithm='HS256'
-            )
-                        
-            return dict(auth_token=auth_token)
-        except Exception as e:
-            raise e
+        payload = {
+            'exp': datetime.utcnow() + timedelta(days=days, seconds=seconds),
+            'iat': datetime.utcnow(),
+            'sub': dict(user_id=user_id, email=email)
+        }
+        auth_token = jwt.encode(
+            payload,
+            CONFIG.SECRET_KEY,
+            algorithm='HS256'
+        )
+
+        return dict(auth_token=auth_token)
 
     @staticmethod
     def compare_password(password, comparant_password):
         return safe_str_cmp(password, comparant_password)
 
-    @classmethod
-    def getUser(cls, user_id):
-        try:
-            user = cls.objects().get(id=user_id)
-            if user:
-                return user.to_dict()
-        except Exception as error:
-            raise error
-
-    @classmethod
-    def decode_auth_token(cls, auth_token):
+    @staticmethod
+    def decode_auth_token(auth_token):
         """  Decodes the auth token:param auth_token:
         :return: integer|string"""
         try:
@@ -88,7 +85,7 @@ class UserModel(db.Document):
             # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
             if payload:
-                return True
+                return payload
 
             return False
 

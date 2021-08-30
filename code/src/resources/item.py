@@ -1,10 +1,10 @@
 from src.validations.item import ItemBodyValidation, ItemParamsValidation, ItemPatchBodyValidation
 from src.security.authenticate import guard, access
-from src.validations.validator import serialize
 from src.controller.item import ItemController
+from src.validations import serialize
 from src.helpers.misc import ROLES
 from flask_restful import Resource
-from flask import request, g
+from flask import g
 
 class ItemResource(Resource):
     """ ItemResouce class contains methods for getting, deleting and updating single item ITem """

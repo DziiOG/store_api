@@ -1,10 +1,10 @@
 from src.validations.user import UserSignUpValidation, UserQueryValidation, UserLoginValidation
-from src.validations.validator import serialize, Validator
+from src.validations import serialize, validate_password, exists
 from src.security.authenticate import guard, access
 from src.controller.user import UserController
 from src.helpers.misc import ROLES
 from flask_restful import Resource
-from flask import request, g
+from flask import g
 
 class UserLoginResource(Resource):
 
@@ -13,12 +13,12 @@ class UserLoginResource(Resource):
         return UserController().login(**g.body)
 
 class UserSignUpResource(Resource):
-
     @serialize(validator=UserSignUpValidation())
-    @Validator.validate_password()
-    @Validator.username_or_email_exists()
+    @exists(['username', 'email'])
+    @validate_password()
+    @UserController().pre_insert()
     def post(self):
-        return UserController().sign_up(**g.body)
+        return UserController().insert(**g.body)
            
 class UserListResource(Resource):
 
@@ -28,7 +28,10 @@ class UserListResource(Resource):
     def get(self):
             return UserController().get_docs(**g.params)
         
-        
+class UserActivationResource(Resource):
+    
+    def get(self):
+        return UserController().activate_user()
         
 class UserLogoutResource(Resource):
     @guard()

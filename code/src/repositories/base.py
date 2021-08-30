@@ -1,52 +1,51 @@
 from typing import List, Dict
+from mongoengine import DoesNotExist
+from src.validations.item import ItemBodyValidation
+import json
 
 
 class BaseRepository:
     def __init__(self, model):
         self.model = model
 
-    def insert(self, **payload: Dict) -> Dict:
-        try:
-            data = self.model(**payload).save()
-            if data:
-                return data.to_dict()
-        except Exception as error:
-            raise error
+    def insert(self, **payload: Dict):
+      try:  
+        data = self.model(**payload).save()
+        return data
+      except DoesNotExist:
+          return None
+          
 
-    def get_by_id(self, id: str) -> Dict:
+    def get_by_id(self, id: str):
         try:
             data = self.model.objects().get(id=id)
-            if data:
-                return data.to_dict()
-        except Exception as error:
-            raise error
+            return data
+        except DoesNotExist:
+            return None
 
-    def get_docs(self, raw=False, **query) -> List[Dict]:
-        try:
+    def get_docs(self, **query):
+       try:
             data = self.model.objects().filter(**query)
-            if data and raw is False:
-                return [item.to_dict() for item in data]
-            else:
-                if data and raw is True:
-                    return [item for item in data]
-        except Exception as error:
-            raise error
+            return [item for item in data]
+           
+       except DoesNotExist:
+           return []
 
-    def update(self, id, **payload) -> Dict:
+    def update(self, id, **payload):
         try:
             data = self.model.objects(id=id).update(**payload)
             if data:
                 updated_data = self.model.objects().get(id=id)
                 if updated_data:
-                    return updated_data.to_dict()
-        except Exception as error:
-            raise error
+                    return updated_data
+        except DoesNotExist:
+            return None
 
-    def delete(self, id) -> Dict:
+    def delete(self, id):
         try:
             data = self.model.objects.get(id=id)
             data.delete()
             if data:
-                return data.to_dict()
-        except Exception as error:
-            raise error
+                return data
+        except DoesNotExist:
+            return None

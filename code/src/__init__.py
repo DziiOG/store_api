@@ -1,11 +1,10 @@
 from redis.exceptions import ConnectionError, AuthenticationError
-from flask_restful import Resource, Api
+from flask_restful import Api
 from src.config.db import initialise_db
 from src.config.config import CONFIG
 from flask import Flask, Blueprint
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from flask_jwt import JWT
 import logging
 import redis
 import os

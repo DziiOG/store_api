@@ -1,57 +1,39 @@
 from src.libs import response
+from pyee import EventEmitter
 from typing import Dict
-from src import app
 
 
-class BaseController:
-    def __init__(self, name: str, repository):
-        self.name = name
+class BaseController(EventEmitter):
+    def __init__(self, name: str, repository, listening=False):
         self.repository = repository
+        self.listening = listening
         self.response = response
+        self.name = name
+        super().__init__()
 
     def insert(self, **payload: Dict) -> Dict:
-        try:
-            data = self.repository.insert(**payload)
-            if data:
-                return self.response.successWithData(data=data, message=f"{self.name} created succesfully", statusCode=201), 201
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+        data = self.repository.insert(**payload)
+        self.listening and self.emit('insert', data)
+        return self.response.successWithData(data=data.to_dict() if data else None, message=f"{self.name} created succesfully", statusCode=201), 201
 
     def get_by_id(self, id: str) -> Dict:
-        try:
-            data = self.repository.get_by_id(id)
-            if data:
-                return self.response.successWithData(data=data, message=f"{self.name} fetched succesfully", statusCode=201)
-            return self.response.error(message="No record found", statusCode=404), 404
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+        data = self.repository.get_by_id(id)
+        if data:
+            return self.response.successWithData(data=data.to_dict(), message=f"{self.name} fetched succesfully", statusCode=201)
+        return self.response.error(message="No record found", statusCode=404), 404
 
     def get_docs(self, **query: Dict) -> Dict:
-        try:
-            data = self.repository.get_docs(**query)
-            return self.response.successWithData(data=data or [], message=f"{self.name} fetched succesfully", statusCode=200)
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+        data = self.repository.get_docs(**query)
+        return self.response.successWithData(data=[item.to_dict() for item in data] or [], message=f"{self.name} fetched succesfully", statusCode=200)
 
     def update(self, id, **payload):
-        try:
-            data = self.repository.update(id=id, **payload)
-            if data:
-                return self.response.successWithData(data=data, message=f"{self.name} updated successfully", statusCode=200)
-            return self.response.error(message="No record found", statusCode=404), 404
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+        data = self.repository.update(id=id, **payload)
+        if data:
+            return self.response.successWithData(data=data.to_dict(), message=f"{self.name} updated successfully", statusCode=200)
+        return self.response.error(message="No record found", statusCode=404), 404
 
     def delete(self, id):
-        try:
-            data = self.repository.delete(id=id)
-            if data:
-                return self.response.successWithData(data=data, message=f"{self.name} deleted successfully", statusCode=200)
-            return self.response.error(message="No record found", statusCode=404), 404
-        except Exception as error:
-            app.logger.error(error)
-            return self.response.error(message=str(error), statusCode=400), 400
+        data = self.repository.delete(id=id)
+        if data:
+            return self.response.successWithData(data=data.to_dict(), message=f"{self.name} deleted successfully", statusCode=200)
+        return self.response.error(message="No record found", statusCode=404), 404
