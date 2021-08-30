@@ -11,6 +11,7 @@ import jwt
 
 
 class UserModel(db.Document):
+    meta = {"collection": "users"}
     email = db.StringField(required=True, unique=True)
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
@@ -48,10 +49,10 @@ class UserModel(db.Document):
         return bcrypt.check_password_hash(self.password, attempted_password)
 
     def user_confirmation_mail(self, token) -> Response:
-        link = request.url_root[0: -1] + \
-            f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
-        text = f'Please click link to confirm your registration: {link}'
+        link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
+        text = f"Please click link to confirm your registration: {link}"
         html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
+        print(text,)
         return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
 
     @staticmethod

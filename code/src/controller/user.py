@@ -49,54 +49,39 @@ class UserController(BaseController):
         """
         # get user email
         email = payload.get('email')
-
         # get user password
         password = payload.get('password')
-
         # find user with email
         docs = self.repository.get_docs(email=email)
-
         # if there's no user
         if docs is None:
-
             # throw this error
             raise Exception("Incorrect Credentials, Please try again")
-
         else:
-
             # assign user
             user = docs[0]
-
             # check if password is correct
             is_correct = user.check_password_correction(password)
-
             # if correct
             if is_correct:
-
                 # check if user has been activated
                 if user.status.value == Status.ACTIVE.value:
-
                     # generate token
                     data = user.encode_auth_token(
                         user_id=user.to_dict().get('_id', None), email=user.to_dict().get('email', None))
-
                     # cache user to redis
                     CacheUser.cache_user(data['auth_token'], user.to_dict())
-
                     # initialise response
                     response_data = dict(
                         **user.to_dict(),
                         auth_token=data['auth_token'].decode('utf-8')
                     )
-
                     # return response withe data and token
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200
-
                 # return is user has not been activated
-                return self.response.error(message="User not activated, please check email to activate account and try again", statusCode=400), 400
-
+                return self.response.error(message="User not activated, please check email to activate account and try again", statusCode=400), 400 
             # return this error if password is incorrect
-            return self.response.error(message="Incorrect Credentials, Please try again"), 400
+            return self.response.error(message="Incorrect Credentials, Please try again"), 400    
 
     def activate_user(self):
         params = request.args.to_dict(flat=True)
@@ -109,14 +94,11 @@ class UserController(BaseController):
                     user.status = Status.ACTIVE.value
                     user.save()
                     # return redirect("http://localhost:3000/", code=302)  # redirect if we have a separate web app
-                    
                     headers = {"Content-Type": "text/html"}
-                    
                     return make_response(render_template("confirmation_page.html", email=user.email), 200, headers)
                 raise Exception("User is already activated")
             raise Exception("User not found")
         raise Exception("Invalid Token or Token has Expired")
-
     def logout(self):
         CacheUser.remove_cached_user(
             request.headers['authorization'].split()[1])

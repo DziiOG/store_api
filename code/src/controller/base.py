@@ -1,15 +1,14 @@
 from src.libs import response
-from typing import Dict
-from src import app
 from pyee import EventEmitter
+from typing import Dict
 
 
 class BaseController(EventEmitter):
-    def __init__(self, name: str, repository, listening = False):
-        self.name = name
-        self.listening = listening
+    def __init__(self, name: str, repository, listening=False):
         self.repository = repository
+        self.listening = listening
         self.response = response
+        self.name = name
         super().__init__()
 
     def insert(self, **payload: Dict) -> Dict:
