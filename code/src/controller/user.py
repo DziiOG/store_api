@@ -1,9 +1,9 @@
+from flask import g, request, render_template, make_response
 from src.security.authenticate import verify_token
 from src.repositories.user import UserRepository
 from src.controller.base import BaseController
 from src.security.redis import CacheUser
 from src.helpers.misc import Status
-from flask import g, request
 from functools import wraps
 from src import app
 
@@ -104,12 +104,18 @@ class UserController(BaseController):
         if payload:
             user_id = payload['sub'].get('user_id', None)
             user = self.repository.get_by_id(user_id)
-            if user and user.status.value == Status.IN_ACTIVE.value:
-                user.status = Status.ACTIVE.value
-                user.save()
-                return self.response.successWithData(data=user.to_dict(), message="Activated Successfully", statusCode=200), 200
-            raise Exception("Unable to process request")
-        raise Exception("Invalid Token")
+            if user:
+                if user.status.value == Status.IN_ACTIVE.value:
+                    user.status = Status.ACTIVE.value
+                    user.save()
+                    # return redirect("http://localhost:3000/", code=302)  # redirect if we have a separate web app
+                    
+                    headers = {"Content-Type": "text/html"}
+                    
+                    return make_response(render_template("confirmation_page.html", email=user.email), 200, headers)
+                raise Exception("User is already activated")
+            raise Exception("User not found")
+        raise Exception("Invalid Token or Token has Expired")
 
     def logout(self):
         CacheUser.remove_cached_user(

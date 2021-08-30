@@ -1,11 +1,11 @@
 from werkzeug.security import safe_str_cmp
 from src.helpers.misc import Status, ROLES
 from datetime import datetime, timedelta
+from src.libs.mailgun import mail_gunner
+from src.config.config import CONFIG
 from flask import url_for, request
 from requests import Response
-from src.config.config import CONFIG
 from src.config.db import db
-from src.libs.mailgun import mail_gunner
 from src import bcrypt
 import jwt
 
@@ -48,8 +48,11 @@ class UserModel(db.Document):
         return bcrypt.check_password_hash(self.password, attempted_password)
 
     def user_confirmation_mail(self, token) -> Response:
-        link = request.url_root[0: -1] + f"/activate-account/activate?token={token.decode('utf-8')}"
-        return mail_gunner(self.email, "User Confirmation Mail", "Store Api", link)
+        link = request.url_root[0: -1] + \
+            f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
+        text = f'Please click link to confirm your registration: {link}'
+        html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
+        return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
 
     @staticmethod
     def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
@@ -71,8 +74,8 @@ class UserModel(db.Document):
     def compare_password(password, comparant_password):
         return safe_str_cmp(password, comparant_password)
 
-    @classmethod
-    def decode_auth_token(cls, auth_token):
+    @staticmethod
+    def decode_auth_token(auth_token):
         """  Decodes the auth token:param auth_token:
         :return: integer|string"""
         try:
