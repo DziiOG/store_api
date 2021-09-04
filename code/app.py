@@ -1,6 +1,5 @@
 from src.config.config import CONFIG
 from src.helpers import errors
-from flask import json
 from src import app
 
 # Handle generic request exceptions here
