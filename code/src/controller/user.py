@@ -97,9 +97,11 @@ class UserController(BaseController):
                     # return redirect("http://localhost:3000/", code=302)  # redirect if we have a separate web app
                     headers = {"Content-Type": "text/html"}
                     return make_response(render_template("confirmation_page.html", email=user.email), 200, headers)
-                raise Exception("User is already activated")
-            raise Exception("User not found")
-        raise Exception("Invalid Token or Token has Expired")
+                raise Exception(3)
+            raise Exception(2)
+        raise Exception(1)
+    
+    
     def logout(self):
         CacheUser.remove_cached_user(
             request.headers['authorization'].split()[1])
