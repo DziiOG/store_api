@@ -106,3 +106,5 @@ class UserController(BaseController):
         CacheUser.remove_cached_user(
             request.headers['authorization'].split()[1])
         return self.response.success(message="User logged out successfully")
+    
+    
