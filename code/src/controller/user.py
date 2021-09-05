@@ -53,8 +53,9 @@ class UserController(BaseController):
         password = payload.get('password')
         # find user with email
         docs = self.repository.get_docs(email=email)
+        
         # if there's no user
-        if docs is None:
+        if not len(docs):
             # throw this error
             raise Exception("Incorrect Credentials, Please try again")
         else:

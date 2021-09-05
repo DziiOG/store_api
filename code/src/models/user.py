@@ -50,7 +50,7 @@ class UserModel(db.Document):
 
     def user_confirmation_mail(self, token) -> Response:
         link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
-        text = f"Please click link to confirm your registration: {link}"
+        text = "Please click link to confirm your registration: {}".format(link)
         html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
         print(text,)
         return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
