@@ -1,7 +1,7 @@
 from src.config.config import CONFIG
-from typing import List
 from requests import Response
 from flask import request
+from typing import List
 import requests
 
 
