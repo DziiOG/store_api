@@ -1,6 +1,6 @@
-from typing import List, Dict
-from mongoengine import DoesNotExist
 from src.validations.item import ItemBodyValidation
+from mongoengine import DoesNotExist
+from typing import List, Dict
 import json
 
 
@@ -26,8 +26,7 @@ class BaseRepository:
     def get_docs(self, **query):
        try:
             data = self.model.objects().filter(**query)
-            return [item for item in data]
-           
+            return [item for item in data]   
        except DoesNotExist:
            return []
 
@@ -35,9 +34,7 @@ class BaseRepository:
         try:
             data = self.model.objects(id=id).update(**payload)
             if data:
-                updated_data = self.model.objects().get(id=id)
-                if updated_data:
-                    return updated_data
+                return data
         except DoesNotExist:
             return None
 
