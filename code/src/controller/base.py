@@ -4,7 +4,7 @@ from typing import Dict
 
 
 class BaseController(EventEmitter):
-    def __init__(self, name: str, repository, listening=False):
+    def __init__(self, name: str, repository, listening: bool = False):
         self.repository = repository
         self.listening = listening
         self.response = response

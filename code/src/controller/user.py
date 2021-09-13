@@ -5,6 +5,7 @@ from src.controller.base import BaseController
 from src.security.redis import CacheUser
 from src.helpers.misc import Status
 from functools import wraps
+from src import bcrypt
 from src import app
 
 
@@ -40,6 +41,7 @@ class UserController(BaseController):
                 # delete confirm password in request body
                 del g.body['confirm_password']
                 # return next function
+                g.body['password'] = bcrypt.generate_password_hash(g.body['password']).decode('utf-8')
                 return func(*args, **kwargs)
             return wrapper
         return pre_insert_decorator
@@ -53,6 +55,7 @@ class UserController(BaseController):
         password = payload.get('password')
         # find user with email
         docs = self.repository.get_docs(email=email)
+
         
         # if there's no user
         if not len(docs):

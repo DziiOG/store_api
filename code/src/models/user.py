@@ -20,10 +20,6 @@ class UserModel(db.Document):
     creation_date = db.DateTimeField()
     modified_date = db.DateTimeField(default=datetime.now)
 
-    def clean(self):
-        self.password = bcrypt.generate_password_hash(
-            self.password).decode('utf-8')
-
     def save(self, *args, **kwargs):
         if not self.creation_date:
             self.creation_date = datetime.now()
@@ -46,13 +42,13 @@ class UserModel(db.Document):
         )
 
     def check_password_correction(self, attempted_password):
+        print(self.password, attempted_password)
         return bcrypt.check_password_hash(self.password, attempted_password)
 
     def user_confirmation_mail(self, token) -> Response:
         link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
-        text = "Please click link to confirm your registration: {}".format(link)
+        text = f"Please click link to confirm your registration : {link}"
         html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
-        print(text,)
         return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
 
     @staticmethod

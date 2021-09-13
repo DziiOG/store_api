@@ -7,7 +7,8 @@ import requests
 
 class MailGun():
     @staticmethod
-    def sendMail(to: List[str], subject: str, title: str, text: str, html: str) -> Response:
+    def sendMail(to: List[str], subject: str, title: str, text, html: str) -> Response:
+        print(text, "text")
         return requests.post(
             f"{CONFIG.MAILGUN_API_BASE_URL}/messages",
             auth=('api', CONFIG.MAILGUN_API_KEY),
