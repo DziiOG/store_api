@@ -71,9 +71,10 @@ api = Api(app=app, prefix="/api/v1")
 #initialise db
 initialise_db(app=app, CONFIG=CONFIG)
 
+print(CONFIG.REDIS_HOST, CONFIG.REDIS_PORT, CONFIG.REDIS_PASS)
 
 try:
-    redis_client = redis.Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=0)
+    redis_client = redis.Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=0, password=CONFIG.REDIS_PASS,)
     if redis_client.ping():
         app.logger.info(f"Connected to Redis on {CONFIG.REDIS_HOST}".format()) 
 except ConnectionError as err:
