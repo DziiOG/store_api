@@ -46,10 +46,10 @@ class UserModel(db.Document):
         return bcrypt.check_password_hash(self.password, attempted_password)
 
     def user_confirmation_mail(self, token) -> Response:
-        link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token.decode('utf-8')}"
+        link = request.url_root[0: -1] + f"/api/v1/users/verify-account/activate?token={token}"
         text = f"Please click link to confirm your registration : {link}"
         html = f'<html>Please click the link to confirm your registration: <a href="{link}"></a> </html>'
-        return mail_gunner([self.email], "User Confirmation Mail", "Store Api", text, html)
+        return mail_gunner([self.email], "User decodeConfirmation Mail", "Store Api", text, html)
 
     @staticmethod
     def encode_auth_token(user_id: str, email: str, days=3, seconds=0):
@@ -65,6 +65,8 @@ class UserModel(db.Document):
             algorithm='HS256'
         )
 
+        print(auth_token)
+
         return dict(auth_token=auth_token)
 
     @staticmethod
@@ -77,7 +79,7 @@ class UserModel(db.Document):
         :return: integer|string"""
         try:
             # get user id
-            payload = jwt.decode(auth_token, CONFIG.SECRET_KEY)
+            payload = jwt.decode(auth_token, CONFIG.SECRET_KEY, algorithms=["HS256"])
             # returns id, user
             # in a bigger project caching in redis is idle if other micro services or api depend on authorisation
             if payload:

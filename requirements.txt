@@ -1,5 +1,8 @@
 aniso8601==9.0.1
+anyascii==0.3.0
 bcrypt==3.2.0
+boto3==1.20.5
+botocore==1.23.5
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.7
@@ -7,6 +10,7 @@ click==8.0.1
 dnspython==1.16.0
 docopt==0.6.2
 email-validator==1.1.3
+filedepot==0.8.0
 Flask==2.0.1
 Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.10
@@ -16,6 +20,7 @@ Flask-WTF==1.0.0
 idna==3.2
 itsdangerous==2.0.1
 Jinja2==3.0.1
+jmespath==0.10.0
 MarkupSafe==2.0.1
 marshmallow==3.14.0
 marshmallow-enum==1.5.1
@@ -25,10 +30,12 @@ pycparser==2.20
 pyee==8.2.2
 PyJWT==2.3.0
 pymongo==3.12.0
+python-dateutil==2.8.2
 python-dotenv==0.19.2
 pytz==2021.3
 redis==3.5.3
 requests==2.26.0
+s3transfer==0.5.0
 six==1.16.0
 smmap==4.0.0
 urllib3==1.26.7

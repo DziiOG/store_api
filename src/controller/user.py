@@ -78,7 +78,7 @@ class UserController(BaseController):
                     # initialise response
                     response_data = dict(
                         **user.to_dict(),
-                        auth_token=data['auth_token'].decode('utf-8')
+                        auth_token=data['auth_token']
                     )
                     # return response withe data and token
                     return self.response.successWithData(data=response_data, message=f"{self.name} logged in successfully", statusCode=200), 200

@@ -32,6 +32,10 @@ class BaseConfiguration(object):
     MAILGUN_EMAIL = os.getenv('MAILGUN_EMAIL')
     MAILGUN_API_BASE_URL = os.getenv('MAILGUN_API_BASE_URL')
     MAILGUN_API_KEY = os.getenv('MAILGUN_API_KEY')
+    AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
+    AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_DOMAIN = os.getenv('AWS_DOMAIN')
 
 
 class TestConfig(BaseConfiguration):

@@ -2,9 +2,10 @@ from src.validations.user import UserSignUpValidation, UserQueryValidation, User
 from src.validations import serialize, validate_password, exists
 from src.security.authenticate import guard, access
 from src.controller.user import UserController
+from src.libs.uploader import upload
 from src.helpers.misc import ROLES
 from flask_restful import Resource
-from flask import g
+from flask import g, request
 
 class UserLoginResource(Resource):
 
@@ -13,6 +14,7 @@ class UserLoginResource(Resource):
         return UserController().login(**g.body)
 
 class UserSignUpResource(Resource):
+    @upload(request, 'avatar')
     @serialize(validator=UserSignUpValidation())
     @exists(['username', 'email'])
     @validate_password()
