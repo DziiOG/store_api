@@ -1,6 +1,7 @@
 
 from werkzeug.utils import secure_filename
 from src.helpers.misc import allowed_file
+from flask import g
 from src.config.config import CONFIG
 from src.libs.response import error
 from functools import wraps
@@ -38,6 +39,7 @@ def upload(request, key: str):
     def upload_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            print("hey")
                 # check whether an input field with name 'user_file' exist
             if key in request.files:
                 # after confirm 'user_file' exist, get the file from input
@@ -45,6 +47,7 @@ def upload(request, key: str):
 
                 # check whether a file is selected
                 if file.filename != '':
+                    print("here")
                     
                 # check whether the file extension is allowed (eg. png,jpeg,jpg,gif)
                     if file and allowed_file(file.filename):
@@ -52,9 +55,7 @@ def upload(request, key: str):
                         
                         # if upload success,will return file name of uploaded file
                         if output:
-                            # write your code here 
                             # to save the file name in database
-                            print( f"{CONFIG.AWS_DOMAIN}{output}", 'file')
                             # return func(*args, **kwargs)
                         # upload failed, redirect to upload page
                             result_dict_with_array_values = request.form.to_dict(flat=False)
@@ -63,13 +64,15 @@ def upload(request, key: str):
                                     for key in result_dict_with_array_values
                                 }
 
-                            print(result)
+                            result[key] = f"{CONFIG.AWS_DOMAIN}{output}"
+                            g.body = dict(**result)
+
+                            return func(*args, **kwargs)
                         else:
                             return error("Unable to upload file"), 400
                     # if file extension not allowed
                     else:
                         return error("File type is not supported"), 400
-
-            # return func(*args, **kwargs)
+            return func(*args, **kwargs)
         return wrapper
     return upload_decorator

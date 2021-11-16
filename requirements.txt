@@ -12,6 +12,7 @@ docopt==0.6.2
 email-validator==1.1.3
 filedepot==0.8.0
 Flask==2.0.1
+Flask-Avatars==0.2.2
 Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.10
 flask-mongoengine==1.0.0
@@ -25,6 +26,7 @@ MarkupSafe==2.0.1
 marshmallow==3.14.0
 marshmallow-enum==1.5.1
 mongoengine==0.23.1
+Pillow==8.4.0
 pipreqs==0.4.11
 pycparser==2.20
 pyee==8.2.2
