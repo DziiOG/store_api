@@ -17,7 +17,7 @@ class UserLoginResource(Resource):
 
 class UserSignUpResource(Resource):
     @get_data(request)
-    @upload(request, 'avatar')
+    @upload(request, ['avatar'])
     @serialize(validator=UserSignUpValidation())
     @exists(['username', 'email'])
     @validate_password()

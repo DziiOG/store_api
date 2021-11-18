@@ -21,4 +21,4 @@ class UserLoginValidation(Schema):
     password = fields.String(required=True)
 
 class UserQueryValidation(Schema):
-    username = fields.String()
+    username = fields.String(required=False)

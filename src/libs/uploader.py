@@ -4,6 +4,7 @@ from src.helpers.misc import allowed_file
 from src.config.config import CONFIG
 from src.libs.response import error
 from functools import wraps
+from typing import List
 import boto3, botocore
 from flask import g
 import os
@@ -35,43 +36,41 @@ def upload_file_to_s3(file, acl="public-read"):
     return file.filename
 
 
-def upload(request, key: str):
+def upload(request, keys: List[str]):
     def upload_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
                 # check whether an input field with name 'user_file' exist
-            if key in request.files:
+            for key in keys:
+                if key in request.files:
                 # after confirm 'user_file' exist, get the file from input
-                file = request.files[key]
+                    file = request.files[key]
 
-                # check whether a file is selected
-                if file.filename != '':
-                    print("here")
-                    
-                # check whether the file extension is allowed (eg. png,jpeg,jpg,gif)
-                    if file and allowed_file(file.filename):
-                        output = upload_file_to_s3(file) 
+                    # check whether a file is selected
+                    if file.filename != '':
                         
-                        # if upload success,will return file name of uploaded file
-                        if output:
-                            # to save the file name in database
-                            # return func(*args, **kwargs)
-                        # upload failed, redirect to upload page
-                            result_dict_with_array_values = request.form.to_dict(flat=False)
-                            result = {
-                                    key: result_dict_with_array_values[key][0] if len(result_dict_with_array_values[key]) == 1 else result_dict_with_array_values[key]
-                                    for key in result_dict_with_array_values
-                                }
+                    # check whether the file extension is allowed (eg. png,jpeg,jpg,gif)
+                        if file and allowed_file(file.filename):
+                            output = upload_file_to_s3(file) 
+                            
+                            # if upload success,will return file name of uploaded file
+                            if output:
+                                # to save the file name in database
+                                result_dict_with_array_values = request.form.to_dict(flat=False)
+                                result = {
+                                        key: result_dict_with_array_values[key][0] if len(result_dict_with_array_values[key]) == 1 else result_dict_with_array_values[key]
+                                        for key in result_dict_with_array_values
+                                    }
 
-                            result[key] = f"{CONFIG.AWS_DOMAIN}{output}"
-                            g.body = dict(**result)
+                                result[key] = f"{CONFIG.AWS_DOMAIN}{output}"
+                                g.body = dict(**result)
 
-                            return func(*args, **kwargs)
+                                return func(*args, **kwargs)
+                            else:
+                                return error("Unable to upload file"), 400
+                        # if file extension not allowed
                         else:
-                            return error("Unable to upload file"), 400
-                    # if file extension not allowed
-                    else:
-                        return error("File type is not supported"), 400
+                            return error("File type is not supported"), 400
             return func(*args, **kwargs)
         return wrapper
     return upload_decorator
