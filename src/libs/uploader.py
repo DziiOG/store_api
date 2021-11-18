@@ -1,11 +1,11 @@
 
 from werkzeug.utils import secure_filename
 from src.helpers.misc import allowed_file
-from flask import g
 from src.config.config import CONFIG
 from src.libs.response import error
 from functools import wraps
 import boto3, botocore
+from flask import g
 import os
 
 s3 = boto3.client(
@@ -39,7 +39,6 @@ def upload(request, key: str):
     def upload_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            print("hey")
                 # check whether an input field with name 'user_file' exist
             if key in request.files:
                 # after confirm 'user_file' exist, get the file from input

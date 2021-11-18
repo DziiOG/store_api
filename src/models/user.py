@@ -13,6 +13,7 @@ import jwt
 class UserModel(db.Document):
     meta = {"collection": "users"}
     email = db.StringField(required=True, unique=True)
+    avatar = db.StringField(required=False)
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
     status = db.EnumField(enum=Status, default=Status.IN_ACTIVE)
@@ -37,6 +38,7 @@ class UserModel(db.Document):
             username=self.username,
             status=str(self.status.value),
             roles=str(self.roles.value),
+            avatar=self.avatar,
             createdAt=self.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
             updatedAt=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S")
         )
@@ -65,7 +67,6 @@ class UserModel(db.Document):
             algorithm='HS256'
         )
 
-        print(auth_token)
 
         return dict(auth_token=auth_token)
 

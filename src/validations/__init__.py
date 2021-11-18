@@ -13,18 +13,15 @@ class Validator():
         def validation_decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                    #validation is params or qquery
+                    #validation is params or query
                     if validation_data == 'params':
                         #validate with schema template get args as dict
-                        validator.load(request.args.to_dict(flat=True))
-                        # append validator data to globals for the function to get
-                        g.params = request.args.to_dict(flat=True)
-                    
+                        validator.load(g.params)
+                     
                     #comment as above but for body
                     if validation_data == 'body':
-                        validator.load(request.get_json())
-                        g.body = request.get_json()
-
+                        validator.load(g.body)
+            
                     #return next function
                     return func(*args, **kwargs)
                 
